@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDoubleSpinBox,
     QGroupBox,
@@ -36,11 +37,24 @@ _PROCESS_ITEMS = [
     (WeldingProcess.SMAW, "SMAW"), (WeldingProcess.GTAW, "GTAW"),
     (WeldingProcess.SAW, "SAW"), (WeldingProcess.GMAW, "GMAW"),
 ]
-_POSITION_ITEMS = [
-    Position.PLATE_1G, Position.PLATE_2G, Position.PLATE_3G, Position.PLATE_4G,
-    Position.PIPE_1G, Position.PIPE_2G, Position.PIPE_5G, Position.PIPE_6G,
+_MATERIAL_CATEGORIES = [
+    "FeⅠ", "FeⅡ", "FeⅢ", "FeⅣ", "FeⅤ", "FeⅥ", "FeⅦ", "FeⅧ", "FeⅨ", "FeⅩ",
 ]
-_MATERIAL_CATEGORIES = ["Fe-1", "Fe-2", "Fe-3", "Fe-4", "Fe-5", "Fe-6", "Fe-7", "Fe-8"]
+
+
+def _positions_for_form(form: str) -> list[Position]:
+    """按试件形式筛选适用的焊接位置（同焊工对话框）。"""
+    mapping = {
+        "板对接": [Position.PLATE_1G, Position.PLATE_2G,
+                  Position.PLATE_3G, Position.PLATE_4G],
+        "管对接": [Position.PIPE_1G, Position.PIPE_2G, Position.PIPE_5G,
+                  Position.PIPE_6G, Position.PIPE_6GR],
+        "管板": [Position.TUBE_1F, Position.TUBE_2F, Position.TUBE_2FR,
+                Position.TUBE_4F, Position.TUBE_5F, Position.TUBE_6F],
+        "板材角焊缝": [Position.PLATE_1F, Position.PLATE_2F,
+                      Position.PLATE_3F, Position.PLATE_4F],
+    }
+    return mapping.get(form, list(Position))
 
 
 class WelderView(QWidget):
@@ -117,10 +131,9 @@ class WelderView(QWidget):
         self.cov_material.addItems(_MATERIAL_CATEGORIES)
         self.cov_form = QComboBox()
         self.cov_form.setEditable(True)
-        self.cov_form.addItems(["板对接", "管对接"])
+        self.cov_form.addItems(["板对接", "管对接", "管板", "板材角焊缝"])
+        self.cov_form.currentTextChanged.connect(self._on_cov_form_change)
         self.cov_position = QComboBox()
-        for p in _POSITION_ITEMS:
-            self.cov_position.addItem(p.value, p)
         row1.addWidget(QLabel("方法")); row1.addWidget(self.cov_process)
         row1.addWidget(QLabel("母材类")); row1.addWidget(self.cov_material)
         row1.addWidget(QLabel("试件")); row1.addWidget(self.cov_form)
@@ -134,8 +147,10 @@ class WelderView(QWidget):
         self.cov_diameter = QDoubleSpinBox()
         self.cov_diameter.setRange(0, 5000); self.cov_diameter.setDecimals(1)
         self.cov_diameter.setSpecialValueText("（板材）")
+        self.cov_backing = QCheckBox("带衬垫")
         row2.addWidget(QLabel("焊缝厚度(mm)")); row2.addWidget(self.cov_thickness)
         row2.addWidget(QLabel("管径(mm)")); row2.addWidget(self.cov_diameter)
+        row2.addWidget(self.cov_backing)
         row2.addStretch()
         self.btn_cov = QPushButton("🔍 查询可施焊焊工")
         self.btn_cov.clicked.connect(self._on_coverage_query)
@@ -146,7 +161,27 @@ class WelderView(QWidget):
         self.cov_result.setReadOnly(True)
         self.cov_result.setMaximumHeight(150)
         lay.addWidget(self.cov_result)
+        # 初始填充位置（板对接）
+        self._on_cov_form_change(self.cov_form.currentText())
         return gb
+
+    def _on_cov_form_change(self, form_text: str) -> None:
+        """查询页：试件形式联动位置列表 + 管径启用。"""
+        positions = _positions_for_form(form_text)
+        cur = self.cov_position.currentData()
+        self.cov_position.blockSignals(True)
+        self.cov_position.clear()
+        for p in positions:
+            self.cov_position.addItem(p.value, p)
+        if cur is not None:
+            idx = self.cov_position.findData(cur)
+            if idx >= 0:
+                self.cov_position.setCurrentIndex(idx)
+        self.cov_position.blockSignals(False)
+        is_tube = "管" in form_text
+        self.cov_diameter.setEnabled(is_tube)
+        if not is_tube:
+            self.cov_diameter.setValue(0)
 
     # ------------------------------------------------------------------
     # 操作
@@ -263,6 +298,7 @@ class WelderView(QWidget):
             thickness=self.cov_thickness.value(),
             outer_diameter=(self.cov_diameter.value() or None),
             position=position,
+            has_backing=self.cov_backing.isChecked(),
         )
         welders = self._repo.list_all()
         if not welders:

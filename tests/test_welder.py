@@ -79,6 +79,19 @@ class TestPositionCoverageFix:
     def test_position_covers(self, qualified, required, expect):
         assert _position_covers(qualified, required) is expect
 
+    @pytest.mark.parametrize("qualified, required, expect", [
+        # 管板 F 系列：6FG 覆盖全管板位置
+        (Position.TUBE_6F, Position.TUBE_5F, True),
+        (Position.TUBE_6F, Position.TUBE_2FR, True),
+        (Position.TUBE_6F, Position.TUBE_1F, True),
+        # 低级不覆盖高级
+        (Position.TUBE_2F, Position.TUBE_6F, False),
+        (Position.TUBE_5F, Position.TUBE_6F, False),
+    ])
+    def test_tube_sheet_position_covers(self, qualified, required, expect):
+        """管板（管-管板）F 系列位置覆盖：6FG 覆盖全管板位置。"""
+        assert _position_covers(qualified, required) is expect
+
 
 # ---------------------------------------------------------------------------
 # 项目代号生成
@@ -112,7 +125,7 @@ class TestProjectCode:
             process_factor="Fef3J",
         )
         code = q.project_code
-        assert "6G(K)" in code   # 带衬垫标记
+        assert "6G(管)(K)" in code   # 带衬垫标记（管对接位置带"(管)"后缀）
         assert "6/57" in code    # 厚度/管径
         assert "Fef3J" in code
 

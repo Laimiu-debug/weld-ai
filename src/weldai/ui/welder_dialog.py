@@ -41,12 +41,38 @@ _PROCESS_ITEMS = [
     (WeldingProcess.GMAW, "GMAW 熔化极气保焊"),
     (WeldingProcess.FCAW, "FCAW 药芯焊丝"),
 ]
-_POSITION_ITEMS = [
-    Position.PLATE_1G, Position.PLATE_2G, Position.PLATE_3G, Position.PLATE_4G,
-    Position.PIPE_1G, Position.PIPE_2G, Position.PIPE_5G, Position.PIPE_6G,
-]
-_MATERIAL_CATEGORIES = ["Fe-1", "Fe-2", "Fe-3", "Fe-4", "Fe-5", "Fe-6", "Fe-7", "Fe-8"]
+
+# 焊接工艺因素代号（TSG Z6002 附件A-3，⑦要素），按焊接方法预设
+_PROCESS_FACTORS: dict[WeldingProcess, list[str]] = {
+    WeldingProcess.SMAW: ["Fef1", "Fef2", "Fef3", "Fef3J", "Fef4", "Fef4J"],
+    WeldingProcess.GTAW: ["Fef1", "Fef2"],
+    WeldingProcess.GMAW: ["Fef1", "Fef2", "Fef3", "Fef3J", "Fef4", "Fef4J"],
+    WeldingProcess.FCAW: ["Fef1", "Fef2", "Fef3", "Fef3J", "Fef4", "Fef4J"],
+    WeldingProcess.SAW: ["Fef1", "Fef2"],
+}
+
+# 试件形式（TSG Z6002 ③要素）
 _SPECIMEN_FORMS = ["板对接", "管对接", "管板", "板材角焊缝"]
+
+# 母材类别（TSG Z6002 用 FeⅠ~FeⅩ 罗马数字，兼容 Fe-1 写法）
+_MATERIAL_CATEGORIES = [
+    "FeⅠ", "FeⅡ", "FeⅢ", "FeⅣ", "FeⅤ", "FeⅥ", "FeⅦ", "FeⅧ", "FeⅨ", "FeⅩ",
+]
+
+
+def _positions_for_form(form: str) -> list[Position]:
+    """按试件形式筛选适用的焊接位置（TSG Z6002）。"""
+    mapping = {
+        "板对接": [Position.PLATE_1G, Position.PLATE_2G,
+                  Position.PLATE_3G, Position.PLATE_4G],
+        "管对接": [Position.PIPE_1G, Position.PIPE_2G, Position.PIPE_5G,
+                  Position.PIPE_6G, Position.PIPE_6GR],
+        "管板": [Position.TUBE_1F, Position.TUBE_2F, Position.TUBE_2FR,
+                Position.TUBE_4F, Position.TUBE_5F, Position.TUBE_6F],
+        "板材角焊缝": [Position.PLATE_1F, Position.PLATE_2F,
+                      Position.PLATE_3F, Position.PLATE_4F],
+    }
+    return mapping.get(form, list(Position))
 
 
 class WelderDialog(QDialog):
@@ -131,7 +157,41 @@ class WelderDialog(QDialog):
         btn_row.addWidget(del_q)
         btn_row.addStretch()
         lay.addLayout(btn_row)
+        # 项目代号实时预览
+        self.code_preview = QLabel(
+            "<small style='color:#888'>选中资格行查看项目代号预览</small>")
+        lay.addWidget(self.code_preview)
+        self.qual_table.itemSelectionChanged.connect(self._update_code_preview)
         return gb
+
+    def _update_code_preview(self) -> None:
+        """实时预览选中行的项目代号。"""
+        rows = self.qual_table.selectionModel().selectedRows()
+        if not rows:
+            self.code_preview.setText(
+                "<small style='color:#888'>选中资格行查看项目代号预览</small>")
+            return
+        r = rows[0].row()
+        try:
+            proc_raw = self.qual_table.cellWidget(r, 0).currentData()
+            proc = (proc_raw if isinstance(proc_raw, WeldingProcess)
+                    else WeldingProcess(proc_raw))
+            pos_raw = self.qual_table.cellWidget(r, 5).currentData()
+            pos = (pos_raw if isinstance(pos_raw, Position)
+                   else Position(pos_raw))
+            q = WelderQualification(
+                process=proc,
+                material_category=self.qual_table.cellWidget(r, 1).currentText(),
+                specimen_form=self.qual_table.cellWidget(r, 2).currentText(),
+                deposited_thickness=self.qual_table.cellWidget(r, 3).value(),
+                outer_diameter=(self.qual_table.cellWidget(r, 4).value() or None),
+                position=pos,
+                process_factor=self.qual_table.cellWidget(r, 6).currentText().strip(),
+            )
+            self.code_preview.setText(
+                f"<b style='color:#1565c0'>项目代号：{q.project_code}</b>")
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     # 资格项目行操作
@@ -156,10 +216,8 @@ class WelderDialog(QDialog):
         dia.setRange(0, 5000); dia.setDecimals(1); dia.setValue(0)
         dia.setSpecialValueText("（板材）")
         pos = QComboBox()
-        for p in _POSITION_ITEMS:
-            pos.addItem(p.value, p)
-        factor = QLineEdit()
-        factor.setPlaceholderText("如 Fef3J（可空）")
+        factor = QComboBox()
+        factor.setEditable(True)  # 预设 + 可手填
         expire = QDateEdit()
         expire.setCalendarPopup(True)
         expire.setDisplayFormat("yyyy-MM-dd")
@@ -169,18 +227,69 @@ class WelderDialog(QDialog):
         for col, w in enumerate(widgets):
             self.qual_table.setCellWidget(row, col, w)
 
+        # 联动：试件形式 → 位置列表 + 管径启用
+        form.currentTextChanged.connect(
+            lambda t, r=row, f=form, p=pos, d=dia: self._on_form_change(r, t, p, d))
+        # 联动：焊接方法 → 工艺因素预设
+        proc.currentIndexChanged.connect(
+            lambda _, r=row, pr=proc, fa=factor: self._on_process_change_row(r, pr, fa))
+
         if q is not None:
             proc.setCurrentText(next((l for p, l in _PROCESS_ITEMS if p == q.process), ""))
             mat.setEditText(q.material_category)
             form.setEditText(q.specimen_form)
             thick.setValue(q.deposited_thickness)
             dia.setValue(q.outer_diameter or 0)
+            self._on_form_change(row, q.specimen_form, pos, dia)  # 先填充位置
             pos.setCurrentText(q.position.value)
-            factor.setText(q.process_factor)
+            self._on_process_change_row(row, proc, factor)        # 先填充因素预设
+            factor.setEditText(q.process_factor)
             if q.expire_date:
                 from PySide6.QtCore import QDate
                 expire.setDate(QDate(q.expire_date.year, q.expire_date.month,
                                      q.expire_date.day))
+        else:
+            # 新行：默认板对接，触发联动
+            self._on_form_change(row, "板对接", pos, dia)
+            self._on_process_change_row(row, proc, factor)
+
+    def _on_form_change(self, row: int, form_text: str,
+                        pos_combo: QComboBox, dia_spin: QDoubleSpinBox) -> None:
+        """试件形式联动：刷新位置列表 + 启用/禁用管径。"""
+        positions = _positions_for_form(form_text)
+        cur = pos_combo.currentData()
+        pos_combo.blockSignals(True)
+        pos_combo.clear()
+        for p in positions:
+            pos_combo.addItem(p.value, p)
+        # 尝试恢复选中
+        if cur is not None:
+            idx = pos_combo.findData(cur)
+            if idx >= 0:
+                pos_combo.setCurrentIndex(idx)
+        pos_combo.blockSignals(False)
+        # 管板/管对接启用管径，板材禁用
+        is_tube = "管" in form_text
+        dia_spin.setEnabled(is_tube)
+        if is_tube and dia_spin.value() == 0:
+            dia_spin.setValue(60)  # 典型管径
+        elif not is_tube:
+            dia_spin.setValue(0)
+
+    def _on_process_change_row(self, row: int, proc_combo: QComboBox,
+                               factor_combo: QComboBox) -> None:
+        """焊接方法联动：刷新工艺因素预设列表。"""
+        proc_raw = proc_combo.currentData()
+        proc = (proc_raw if isinstance(proc_raw, WeldingProcess)
+                else WeldingProcess(proc_raw))
+        cur = factor_combo.currentText()
+        factor_combo.blockSignals(True)
+        factor_combo.clear()
+        for f in _PROCESS_FACTORS.get(proc, []):
+            factor_combo.addItem(f)
+        factor_combo.blockSignals(False)
+        if cur:
+            factor_combo.setEditText(cur)
 
     def _del_qual_row(self) -> None:
         rows = sorted(
@@ -233,7 +342,7 @@ class WelderDialog(QDialog):
             dia = self.qual_table.cellWidget(r, 4).value()
             pos_raw = self.qual_table.cellWidget(r, 5).currentData()
             pos = pos_raw if isinstance(pos_raw, Position) else Position(pos_raw)
-            factor = self.qual_table.cellWidget(r, 6).text().strip()
+            factor = self.qual_table.cellWidget(r, 6).currentText().strip()
             ed = self.qual_table.cellWidget(r, 7).date()
             welder.qualifications.append(WelderQualification(
                 process=proc,

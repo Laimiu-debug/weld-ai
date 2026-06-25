@@ -101,9 +101,9 @@ def test_position_coverage_6g_covers_most():
     std = get_default_standard()
     covered = std.coverage_positions(Position.PIPE_6G)
     covered_vals = {p.value for p in covered}
-    # 6G 覆盖管各位置
-    assert "6G" in covered_vals
-    assert "5G" in covered_vals
+    # 6G(管) 覆盖管各位置（管对接位置带"(管)"后缀）
+    assert "6G(管)" in covered_vals
+    assert "5G(管)" in covered_vals
 
 
 # ---------------------------------------------------------------------------

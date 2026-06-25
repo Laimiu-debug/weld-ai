@@ -127,7 +127,14 @@ class CurrentType(str, Enum):
 
 
 class Position(str, Enum):
-    """焊接位置代号（板/管）。难度等级用于覆盖判定（高难度覆盖低难度）。"""
+    """焊接位置代号（依据 TSG Z6002 附件A）。
+
+    板对接 G 系列：1G/2G/3G/4G
+    管对接 G 系列：1G(管)/2G(管)/5G(管)/6G(管)/6GR —— 带后缀消除与板材歧义
+    板角焊缝 F 系列：1F/2F/3F/4F
+    管板（管-管板）F 系列：2F(管板)/2FR/4F(管板)/5F/6FG
+    难度等级用于覆盖判定（高覆盖低），见 welder_engine._POSITION_COVERS。
+    """
 
     # 板对接
     PLATE_1G = "1G"
@@ -139,12 +146,59 @@ class Position(str, Enum):
     PLATE_2F = "2F"
     PLATE_3F = "3F"
     PLATE_4F = "4F"
-    # 管对接
+    # 管对接（带"(管)"后缀避免与板材歧义）
     PIPE_1G = "1G(管)"
     PIPE_2G = "2G(管)"
-    PIPE_5G = "5G"
-    PIPE_6G = "6G"
+    PIPE_5G = "5G(管)"
+    PIPE_6G = "6G(管)"
     PIPE_6GR = "6GR"
+    # 管板（管-管板）角接
+    TUBE_1F = "1F(管板)"
+    TUBE_2F = "2F(管板)"
+    TUBE_2FR = "2FR"
+    TUBE_4F = "4F(管板)"
+    TUBE_5F = "5F(管板)"
+    TUBE_6F = "6FG"
+
+    @property
+    def cn(self) -> str:
+        return {
+            Position.PLATE_1G: "1G 板对接平焊",
+            Position.PLATE_2G: "2G 板对接横焊",
+            Position.PLATE_3G: "3G 板对接立焊",
+            Position.PLATE_4G: "4G 板对接仰焊",
+            Position.PLATE_1F: "1F 板角焊平焊",
+            Position.PLATE_2F: "2F 板角焊横焊",
+            Position.PLATE_3F: "3F 板角焊立焊",
+            Position.PLATE_4F: "4F 板角焊仰焊",
+            Position.PIPE_1G: "1G 管对接转动焊",
+            Position.PIPE_2G: "2G 管对接垂直固定焊",
+            Position.PIPE_5G: "5G 管对接水平固定焊",
+            Position.PIPE_6G: "6G 管对接45°倾斜固定焊",
+            Position.PIPE_6GR: "6GR 管对接45°倾斜固定(带限制环)",
+            Position.TUBE_1F: "1F 管板转动焊",
+            Position.TUBE_2F: "2F 管板垂直固定焊",
+            Position.TUBE_2FR: "2FR 管板水平转动焊",
+            Position.TUBE_4F: "4F 管板仰焊",
+            Position.TUBE_5F: "5F 管板水平固定全位置焊",
+            Position.TUBE_6F: "6FG 管板45°倾斜固定全位置焊",
+        }[self]
+
+    @property
+    def form_type(self) -> str:
+        """所属试件形式分组（板对接/管对接/管板/板角焊缝），用于下拉分组显示。"""
+        return {
+            Position.PLATE_1G: "板对接", Position.PLATE_2G: "板对接",
+            Position.PLATE_3G: "板对接", Position.PLATE_4G: "板对接",
+            Position.PLATE_1F: "板角焊缝", Position.PLATE_2F: "板角焊缝",
+            Position.PLATE_3F: "板角焊缝", Position.PLATE_4F: "板角焊缝",
+            Position.PIPE_1G: "管对接", Position.PIPE_2G: "管对接",
+            Position.PIPE_5G: "管对接", Position.PIPE_6G: "管对接",
+            Position.PIPE_6GR: "管对接",
+            Position.TUBE_1F: "管板", Position.TUBE_2F: "管板",
+            Position.TUBE_2FR: "管板", Position.TUBE_4F: "管板",
+            Position.TUBE_5F: "管板", Position.TUBE_6F: "管板",
+        }[self]
 
 
 @dataclass(frozen=True)

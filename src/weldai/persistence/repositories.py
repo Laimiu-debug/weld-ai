@@ -317,12 +317,26 @@ def _qualification_from_dict(d: dict) -> WelderQualification:
         specimen_form=d["specimen_form"],
         deposited_thickness=d["deposited_thickness"],
         outer_diameter=d.get("outer_diameter"),
-        position=Position(d["position"]),
+        position=Position(_normalize_position(d["position"])),
         process_factor=d.get("process_factor", ""),
         has_backing=d.get("has_backing", False),
         qualified_date=_parse_date(d.get("qualified_date")),
         expire_date=_parse_date(d.get("expire_date")),
     )
+
+
+# 旧版位置值 → 新版（管对接加"(管)"后缀消除歧义）
+_POSITION_LEGACY_MAP = {
+    "5G": "5G(管)",
+    "6G": "6G(管)",
+}
+
+
+def _normalize_position(val: str) -> str:
+    """旧版位置值兼容映射（5G→5G(管)、6G→6G(管)），新值原样返回。"""
+    if val in _POSITION_LEGACY_MAP:
+        return _POSITION_LEGACY_MAP[val]
+    return val
 
 
 def _renewal_to_dict(r: RenewalRecord) -> dict:

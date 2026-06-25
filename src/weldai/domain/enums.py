@@ -152,13 +152,17 @@ class Position(str, Enum):
     PIPE_5G = "5G(管)"
     PIPE_6G = "6G(管)"
     PIPE_6GR = "6GR"
-    # 管板（管-管板）角接
-    TUBE_1F = "1F(管板)"
-    TUBE_2F = "2F(管板)"
-    TUBE_2FR = "2FR"
-    TUBE_4F = "4F(管板)"
-    TUBE_5F = "5F(管板)"
-    TUBE_6F = "6FG"
+    # 管材角焊缝（管-管角焊，F系列）
+    PIPE_F_1F = "1F(管角)"
+    PIPE_F_2F = "2F(管角)"
+    PIPE_F_4F = "4F(管角)"
+    PIPE_F_5F = "5F(管角)"
+    # 管板角接头（管-管板，FG系列，依据 TSG Z6002 表A-4）
+    TUBE_2FRG = "2FRG"
+    TUBE_2FG = "2FG"
+    TUBE_4FG = "4FG"
+    TUBE_5FG = "5FG"
+    TUBE_6FG = "6FG"
 
     @property
     def cn(self) -> str:
@@ -171,22 +175,25 @@ class Position(str, Enum):
             Position.PLATE_2F: "2F 板角焊横焊",
             Position.PLATE_3F: "3F 板角焊立焊",
             Position.PLATE_4F: "4F 板角焊仰焊",
-            Position.PIPE_1G: "1G 管对接转动焊",
-            Position.PIPE_2G: "2G 管对接垂直固定焊",
-            Position.PIPE_5G: "5G 管对接水平固定焊",
-            Position.PIPE_6G: "6G 管对接45°倾斜固定焊",
+            Position.PIPE_1G: "1G(管) 管对接转动焊",
+            Position.PIPE_2G: "2G(管) 管对接垂直固定焊",
+            Position.PIPE_5G: "5G(管) 管对接水平固定焊",
+            Position.PIPE_6G: "6G(管) 管对接45°倾斜固定焊",
             Position.PIPE_6GR: "6GR 管对接45°倾斜固定(带限制环)",
-            Position.TUBE_1F: "1F 管板转动焊",
-            Position.TUBE_2F: "2F 管板垂直固定焊",
-            Position.TUBE_2FR: "2FR 管板水平转动焊",
-            Position.TUBE_4F: "4F 管板仰焊",
-            Position.TUBE_5F: "5F 管板水平固定全位置焊",
-            Position.TUBE_6F: "6FG 管板45°倾斜固定全位置焊",
+            Position.PIPE_F_1F: "1F(管角) 管角焊平焊",
+            Position.PIPE_F_2F: "2F(管角) 管角焊横焊",
+            Position.PIPE_F_4F: "4F(管角) 管角焊仰焊",
+            Position.PIPE_F_5F: "5F(管角) 管角焊全位置焊",
+            Position.TUBE_2FRG: "2FRG 管板角接转动焊",
+            Position.TUBE_2FG: "2FG 管板角接垂直固定焊",
+            Position.TUBE_4FG: "4FG 管板角接仰焊",
+            Position.TUBE_5FG: "5FG 管板角接水平固定全位置焊",
+            Position.TUBE_6FG: "6FG 管板角接45°倾斜固定全位置焊",
         }[self]
 
     @property
     def form_type(self) -> str:
-        """所属试件形式分组（板对接/管对接/管板/板角焊缝），用于下拉分组显示。"""
+        """所属试件形式分组（板对接/管对接/管板角接/管材角焊缝/板角焊缝）。"""
         return {
             Position.PLATE_1G: "板对接", Position.PLATE_2G: "板对接",
             Position.PLATE_3G: "板对接", Position.PLATE_4G: "板对接",
@@ -195,9 +202,11 @@ class Position(str, Enum):
             Position.PIPE_1G: "管对接", Position.PIPE_2G: "管对接",
             Position.PIPE_5G: "管对接", Position.PIPE_6G: "管对接",
             Position.PIPE_6GR: "管对接",
-            Position.TUBE_1F: "管板", Position.TUBE_2F: "管板",
-            Position.TUBE_2FR: "管板", Position.TUBE_4F: "管板",
-            Position.TUBE_5F: "管板", Position.TUBE_6F: "管板",
+            Position.PIPE_F_1F: "管材角焊缝", Position.PIPE_F_2F: "管材角焊缝",
+            Position.PIPE_F_4F: "管材角焊缝", Position.PIPE_F_5F: "管材角焊缝",
+            Position.TUBE_2FRG: "管板角接", Position.TUBE_2FG: "管板角接",
+            Position.TUBE_4FG: "管板角接", Position.TUBE_5FG: "管板角接",
+            Position.TUBE_6FG: "管板角接",
         }[self]
 
 

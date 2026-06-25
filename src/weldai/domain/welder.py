@@ -17,16 +17,21 @@ from .enums import Position, WeldingProcess
 class WelderQualification:
     """单项合格资格（对应一个项目代号）。
 
-    seven-element 字段化存储 ①-⑦，便于覆盖判定与组合成项目代号字符串。
+    项目代号结构（TSG Z6002 附件A A9.1.1）：①-②-③-④(/⑤)-⑥-⑦
+        ① 焊接方法   ② 母材类别   ③ 焊接位置代号   ④ 焊缝金属厚度(/⑤管径)
+        ⑥ 填充金属类别（Fef系列）  ⑦ 焊接工艺因素代号（01/02/13等）
+    试件形式隐含在③位置代号中（G=对接、F=角焊、FG=管板角接、FRG=管板转动）。
+    母材类别(②)复用 NB/T 47014 分类体系（FeⅠ/FeⅡ...）。
     """
 
     process: WeldingProcess          # ① 焊接方法
-    material_category: str           # ② 母材类别号，如 "Fe-1"（复用 NB/T 47014）
-    specimen_form: str               # ③ 试件形式，如 "板对接"/"管对接"/"管板"
-    deposited_thickness: float       # ④ 焊缝金属厚度 mm
+    material_category: str           # ② 母材类别号，如 "FeⅠ"
+    position: Position = Position.PLATE_1G  # ③ 焊接位置（代号隐含试件形式）
+    deposited_thickness: float = 12.0     # ④ 焊缝金属厚度 mm
     outer_diameter: float | None = None  # ⑤ 管材外径 mm（板材试件为 None）
-    position: Position = Position.PLATE_1G  # ⑥ 焊接位置
-    process_factor: str = ""         # ⑦ 焊接工艺因素代号，如 "Fef3J"
+    fill_metal_class: str = ""       # ⑥ 填充金属类别，如 "Fef3J"/"FefS"
+    process_factor: str = ""         # ⑦ 焊接工艺因素代号，如 "01"/"13"
+    specimen_form: str = ""          # 试件形式（冗余，仅显示用；从位置推断）
     has_backing: bool = False        # 是否带衬垫（影响覆盖：不衬垫覆盖衬垫，反之不可）
     qualified_date: date | None = None    # 合格日期
     expire_date: date | None = None       # 到期日（有效期 4 年）
@@ -37,26 +42,31 @@ class WelderQualification:
 
     @property
     def project_code(self) -> str:
-        """生成项目代号字符串 ①-②-③-④(/⑤)-⑥-⑦（TSG Z6002 格式）。"""
+        """生成项目代号字符串 ①-②-③-④(/⑤)-⑥-⑦（TSG Z6002 A9.1.1 格式）。"""
         parts = [
             self.process.value,                 # ① 焊接方法
             self.material_category,             # ② 母材类别
-            self.specimen_form,                 # ③ 试件形式
+            self._position_code(),              # ③ 焊接位置代号
         ]
         # ④厚度(/⑤管径)
         size = f"{_fmt(self.deposited_thickness)}"
         if self.outer_diameter is not None:
             size += f"/{_fmt(self.outer_diameter)}"
         parts.append(size)
-        # ⑥位置（带衬垫加 K）
-        pos = self.position.value
-        if self.has_backing:
-            pos += "(K)"
-        parts.append(pos)
-        # ⑦工艺因素
+        # ⑥填充金属类别
+        if self.fill_metal_class:
+            parts.append(self.fill_metal_class)
+        # ⑦工艺因素代号
         if self.process_factor:
             parts.append(self.process_factor)
         return "-".join(str(p) for p in parts)
+
+    def _position_code(self) -> str:
+        """③位置代号：带衬垫加 K（TSG Z6002 规定）。"""
+        pos = self.position.value
+        if self.has_backing:
+            pos += "(K)"
+        return pos
 
     @property
     def days_to_expire(self) -> int | None:

@@ -22,12 +22,12 @@ class WeldTask:
     """一项焊接任务需求（用于判定焊工资格是否覆盖）。"""
 
     process: WeldingProcess
-    material_category: str           # 母材类别号 Fe-1
-    joint_form: str = "对接"          # 试件形式
+    material_category: str           # 母材类别号 FeⅠ
     thickness: float = 0.0           # 焊缝金属厚度 mm
     outer_diameter: float | None = None  # 管外径 mm
-    position: Position = Position.PLATE_1G
+    position: Position = Position.PLATE_1G  # 焊接位置（形式隐含在代号）
     has_backing: bool = False        # 是否带衬垫
+    joint_form: str = ""             # 试件形式（冗余，可由位置推断）
 
 
 @dataclass
@@ -59,13 +59,18 @@ _POSITION_COVERS: dict[str, set[str]] = {
     # 板角焊缝 F 系列
     "1F": {"1F"}, "2F": {"1F", "2F"},
     "3F": {"1F", "3F"}, "4F": {"1F", "4F"},
-    # 管板（管-管板）F 系列：6FG 覆盖全管板位置
-    "1F(管板)": {"1F(管板)"},
-    "2F(管板)": {"1F(管板)", "2F(管板)"},
-    "2FR": {"1F(管板)", "2F(管板)", "2FR"},
-    "4F(管板)": {"1F(管板)", "4F(管板)"},
-    "5F(管板)": {"1F(管板)", "2F(管板)", "4F(管板)", "5F(管板)"},
-    "6FG": {"1F(管板)", "2F(管板)", "2FR", "4F(管板)", "5F(管板)", "6FG"},
+    # 管材角焊缝 F 系列（管-管角焊）
+    "1F(管角)": {"1F(管角)", "1F"},
+    "2F(管角)": {"1F(管角)", "2F(管角)", "1F", "2F"},
+    "4F(管角)": {"1F(管角)", "4F(管角)", "1F", "4F"},
+    "5F(管角)": {"1F(管角)", "2F(管角)", "4F(管角)", "5F(管角)",
+                 "1F", "2F", "4F"},
+    # 管板角接 FG 系列（TSG Z6002 表A-4）：6FG 覆盖全管板位置
+    "2FRG": {"2FRG", "2FG"},
+    "2FG": {"2FG", "2FRG"},
+    "4FG": {"2FG", "2FRG", "4FG"},
+    "5FG": {"2FG", "2FRG", "4FG", "5FG"},
+    "6FG": {"2FG", "2FRG", "4FG", "5FG", "6FG"},
 }
 
 
@@ -103,10 +108,8 @@ def _thickness_covers(qualified_t: float, required_t: float) -> bool:
 def _diameter_covers(qualified_d: float | None, required_d: float | None) -> bool:
     """管径覆盖（TSG Z6002 表A-8）。
 
-    阶段0误写为 D≤25 覆盖不限，已修正（D<25 仅覆盖自身外径）：
-      - D < 25      → 仅 D（不向上覆盖）
-      - 25 ≤ D < 76 → 25 ~ 不限
-      - D ≥ 76      → 76 ~ 不限
+      - D < 25      → 覆盖 [D, 不限]
+      - D ≥ 25      → 覆盖 [0.5D, 不限]
     板材对接合格可覆盖 D ≥ 76 的管材对接。
     """
     if required_d is None:
@@ -115,32 +118,33 @@ def _diameter_covers(qualified_d: float | None, required_d: float | None) -> boo
         # 板材试件合格 → 可覆盖 D≥76 管材
         return required_d >= 76
     if qualified_d < 25:
-        return required_d >= qualified_d - 1e-9 and required_d <= qualified_d + 1e-9
-    if qualified_d < 76:
-        return required_d >= 25
-    return required_d >= 76
+        return required_d >= qualified_d - 1e-9
+    return required_d >= 0.5 * qualified_d - 1e-9
 
 
 def _form_covers(qualified_form: str, required_form: str) -> bool:
     """试件形式覆盖（TSG Z6002）：
+      - 管对接 → 管对接 + 板对接（管材覆盖板材对接）
       - 板对接 → 仅板对接（不覆盖管对接/管板）
-      - 管对接 → 管对接 + 管板
-      - 管板   → 仅管板
+      - 管板角接(管板) → 仅管板角接
+      - 管材角焊缝 → 管材角焊缝 + 板角焊缝
       - 对接焊缝资格可覆盖同等位置的角焊缝（反向不可）
-      - 泛称"对接"被任何含"对接"的资格覆盖
     """
     q = (qualified_form or "").strip()
     r = (required_form or "").strip()
     if q == r:
         return True
-    # 任务为泛称"对接"时，任何"X对接"资格都覆盖
-    if r == "对接" and "对接" in q:
+    # 管对接覆盖板对接（管材覆盖板材）
+    if "管对接" in q and r == "板对接":
         return True
-    # 管对接覆盖管板
+    # 管对接覆盖管板角接（TSG Z6002：管对接资格可焊管板角接）
     if "管对接" in q and "管板" in r:
         return True
-    # 对接资格覆盖角焊缝
-    if "对接" in q and "角焊" in r:
+    # 管材角焊缝覆盖板角焊缝
+    if "管材角焊缝" in q and r == "板角焊缝":
+        return True
+    # 对接资格覆盖角焊缝（板对接→板角焊缝、管对接→管材角焊缝）
+    if "对接" in q and "角焊缝" in r:
         return True
     return False
 
@@ -182,11 +186,14 @@ class WelderEngine:
                 f"母材类别不符: 资格{q.material_category} ≠ 任务{task.material_category}"
             )
 
-        # ③ 试件形式（板对接/管对接/管板 不可混用）
-        if not _form_covers(q.specimen_form, task.joint_form):
+        # ③ 试件形式（板对接/管对接/管板角接 不可混用）
+        # 试件形式隐含在位置代号中，从 position.form_type 推断
+        q_form = q.position.form_type
+        t_form = task.position.form_type if hasattr(task.position, "form_type") else task.joint_form
+        if not _form_covers(q_form, t_form):
             ok = False
             reasons.append(
-                f"试件形式不符: 资格{q.specimen_form} 不能覆盖 {task.joint_form}"
+                f"试件形式不符: 资格{q_form} 不能覆盖 {t_form}"
             )
 
         # ⑥ 焊接位置（高覆盖低）

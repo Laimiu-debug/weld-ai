@@ -46,12 +46,12 @@ class TestThicknessCoverageFix:
 
 class TestDiameterCoverageFix:
     @pytest.mark.parametrize("qualified_d, required_d, expect", [
-        (20.0, 20.0, True),    # D<25 → 仅覆盖自身
-        (20.0, 30.0, False),   # D<25 → 不向上覆盖（阶段0错误会判True）
-        (50.0, 100.0, True),   # 25≤D<76 → 25~不限
-        (50.0, 20.0, False),   # 25≤D<76 → 下限25
-        (100.0, 80.0, True),   # D≥76 → 76~不限
-        (100.0, 50.0, False),  # D≥76 → 下限76
+        (20.0, 20.0, True),    # D<25 → 覆盖[D,∞)
+        (20.0, 30.0, True),    # D<25 → 覆盖[D,∞)（含更大管径）
+        (50.0, 100.0, True),   # D≥25 → 覆盖[0.5D,∞)
+        (50.0, 20.0, False),   # D≥25 → 下限0.5D=25，20<25 不覆盖
+        (100.0, 80.0, True),   # D≥25 → 覆盖[0.5D,∞)，80≥50
+        (100.0, 40.0, False),  # D≥25 → 下限0.5D=50，40<50 不覆盖
     ])
     def test_diameter_covers(self, qualified_d, required_d, expect):
         assert _diameter_covers(qualified_d, required_d) is expect
@@ -80,16 +80,17 @@ class TestPositionCoverageFix:
         assert _position_covers(qualified, required) is expect
 
     @pytest.mark.parametrize("qualified, required, expect", [
-        # 管板 F 系列：6FG 覆盖全管板位置
-        (Position.TUBE_6F, Position.TUBE_5F, True),
-        (Position.TUBE_6F, Position.TUBE_2FR, True),
-        (Position.TUBE_6F, Position.TUBE_1F, True),
+        # 管板角接 FG 系列：6FG 覆盖全管板位置
+        (Position.TUBE_6FG, Position.TUBE_5FG, True),
+        (Position.TUBE_6FG, Position.TUBE_4FG, True),
+        (Position.TUBE_6FG, Position.TUBE_2FG, True),
+        (Position.TUBE_6FG, Position.TUBE_2FRG, True),
         # 低级不覆盖高级
-        (Position.TUBE_2F, Position.TUBE_6F, False),
-        (Position.TUBE_5F, Position.TUBE_6F, False),
+        (Position.TUBE_2FG, Position.TUBE_6FG, False),
+        (Position.TUBE_5FG, Position.TUBE_6FG, False),
     ])
     def test_tube_sheet_position_covers(self, qualified, required, expect):
-        """管板（管-管板）F 系列位置覆盖：6FG 覆盖全管板位置。"""
+        """管板角接 FG 系列位置覆盖：6FG 覆盖全管板位置。"""
         assert _position_covers(qualified, required) is expect
 
 
@@ -101,33 +102,32 @@ class TestProjectCode:
     def test_basic_project_code(self):
         q = WelderQualification(
             process=WeldingProcess.SMAW,
-            material_category="Fe-1",
-            specimen_form="板对接",
+            material_category="FeⅠ",
             deposited_thickness=12.0,
             position=Position.PLATE_1G,
+            fill_metal_class="Fef3J",
+            process_factor="01",
         )
         code = q.project_code
-        assert "SMAW" in code
-        assert "Fe-1" in code
-        assert "板对接" in code
-        assert "12" in code
-        assert "1G" in code
+        # 标准结构 ①-②-③-④-⑥-⑦
+        assert code == "SMAW-FeⅠ-1G-12-Fef3J-01"
 
     def test_backing_mark_in_code(self):
         q = WelderQualification(
             process=WeldingProcess.GTAW,
-            material_category="Fe-8",
-            specimen_form="管对接",
+            material_category="FeⅧ",
             deposited_thickness=6.0,
             outer_diameter=57.0,
             position=Position.PIPE_6G,
             has_backing=True,
-            process_factor="Fef3J",
+            fill_metal_class="FefS",
+            process_factor="02",
         )
         code = q.project_code
-        assert "6G(管)(K)" in code   # 带衬垫标记（管对接位置带"(管)"后缀）
-        assert "6/57" in code    # 厚度/管径
-        assert "Fef3J" in code
+        assert "6G(管)(K)" in code   # ③位置带衬垫标记
+        assert "6/57" in code    # ④厚度/⑤管径
+        assert "FefS" in code    # ⑥填充金属类别
+        assert "02" in code      # ⑦工艺因素代号
 
 
 # ---------------------------------------------------------------------------

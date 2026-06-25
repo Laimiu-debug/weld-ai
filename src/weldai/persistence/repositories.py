@@ -299,11 +299,12 @@ def _qualification_to_dict(q: WelderQualification) -> dict:
     return {
         "process": q.process.value,
         "material_category": q.material_category,
-        "specimen_form": q.specimen_form,
+        "position": q.position.value,
         "deposited_thickness": q.deposited_thickness,
         "outer_diameter": q.outer_diameter,
-        "position": q.position.value,
+        "fill_metal_class": q.fill_metal_class,
         "process_factor": q.process_factor,
+        "specimen_form": q.specimen_form,
         "has_backing": q.has_backing,
         "qualified_date": q.qualified_date.isoformat() if q.qualified_date else None,
         "expire_date": q.expire_date.isoformat() if q.expire_date else None,
@@ -313,27 +314,39 @@ def _qualification_to_dict(q: WelderQualification) -> dict:
 def _qualification_from_dict(d: dict) -> WelderQualification:
     return WelderQualification(
         process=WeldingProcess(d["process"]),
-        material_category=d["material_category"],
-        specimen_form=d["specimen_form"],
-        deposited_thickness=d["deposited_thickness"],
+        material_category=d.get("material_category", ""),
+        position=Position(_normalize_position(d.get("position", "1G"))),
+        deposited_thickness=d.get("deposited_thickness", 12.0),
         outer_diameter=d.get("outer_diameter"),
-        position=Position(_normalize_position(d["position"])),
+        fill_metal_class=d.get("fill_metal_class", ""),
         process_factor=d.get("process_factor", ""),
+        specimen_form=d.get("specimen_form", ""),
         has_backing=d.get("has_backing", False),
         qualified_date=_parse_date(d.get("qualified_date")),
         expire_date=_parse_date(d.get("expire_date")),
     )
 
 
-# 旧版位置值 → 新版（管对接加"(管)"后缀消除歧义）
+# 旧版位置值 → 新版（管对接加"(管)"后缀、管板改标准FG代号）
 _POSITION_LEGACY_MAP = {
     "5G": "5G(管)",
     "6G": "6G(管)",
+    # 旧管板代号 → 标准 TSG Z6002 表A-4 代号
+    "1F(管板)": "2FRG",
+    "2F(管板)": "2FG",
+    "2FR": "2FRG",
+    "4F(管板)": "4FG",
+    "5F(管板)": "5FG",
+    "6FG": "6FG",  # 已是标准代号
 }
 
 
 def _normalize_position(val: str) -> str:
-    """旧版位置值兼容映射（5G→5G(管)、6G→6G(管)），新值原样返回。"""
+    """旧版位置值兼容映射，新值原样返回。
+
+    - 管对接：5G→5G(管)、6G→6G(管)
+    - 管板角接：2F(管板)→2FG、4F(管板)→4FG、5F(管板)→5FG（TSG Z6002 表A-4）
+    """
     if val in _POSITION_LEGACY_MAP:
         return _POSITION_LEGACY_MAP[val]
     return val

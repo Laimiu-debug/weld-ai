@@ -49,8 +49,10 @@ def _positions_for_form(form: str) -> list[Position]:
                   Position.PLATE_3G, Position.PLATE_4G],
         "管对接": [Position.PIPE_1G, Position.PIPE_2G, Position.PIPE_5G,
                   Position.PIPE_6G, Position.PIPE_6GR],
-        "管板": [Position.TUBE_1F, Position.TUBE_2F, Position.TUBE_2FR,
-                Position.TUBE_4F, Position.TUBE_5F, Position.TUBE_6F],
+        "管板角接": [Position.TUBE_2FRG, Position.TUBE_2FG, Position.TUBE_4FG,
+                    Position.TUBE_5FG, Position.TUBE_6FG],
+        "管材角焊缝": [Position.PIPE_F_1F, Position.PIPE_F_2F,
+                      Position.PIPE_F_4F, Position.PIPE_F_5F],
         "板材角焊缝": [Position.PLATE_1F, Position.PLATE_2F,
                       Position.PLATE_3F, Position.PLATE_4F],
     }
@@ -131,7 +133,7 @@ class WelderView(QWidget):
         self.cov_material.addItems(_MATERIAL_CATEGORIES)
         self.cov_form = QComboBox()
         self.cov_form.setEditable(True)
-        self.cov_form.addItems(["板对接", "管对接", "管板", "板材角焊缝"])
+        self.cov_form.addItems(["板对接", "管对接", "管板角接", "管材角焊缝", "板材角焊缝"])
         self.cov_form.currentTextChanged.connect(self._on_cov_form_change)
         self.cov_position = QComboBox()
         row1.addWidget(QLabel("方法")); row1.addWidget(self.cov_process)

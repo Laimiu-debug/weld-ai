@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+*.egg
+
+# 虚拟环境 / 便携 Python（不入库）
+.python/
+.venv/
+venv/
+env/
+
+# 便携工具（不入库）
+.git_tool/
+.git_portable.zip
+
+# 构建产物（不入库，按需重新打包）
+build/
+dist/
+*.spec.bak
+
+# 数据库（运行时生成）
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE / 系统
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# 临时文件（注意：_screen.py 是正式源码，勿被 _*.py 误伤，已单独 force-add）
+_diag*.py
+_smoke*.py
+*.log

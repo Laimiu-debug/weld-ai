@@ -1,0 +1,81 @@
+# NB/T 47014-2023 覆盖范围规则（表7 厚度/管径 + 位置覆盖）
+#
+# ⚠️ 数据状态：阶段0示例数据。厚度分段来自研究资料，边界值待阶段2用标准原文核实。
+#    表达式语法受限（仅算术 + min/max/abs/round），变量：
+#      t = 试件母材厚度(mm)
+#      d = 试件管外径(mm)
+#    max 为 null → 不限上限
+#    详见 docs/standards_sources.md 待核实清单。
+
+standard: NB/T 47014-2023
+source_table: 表7
+data_status: 阶段2（厚度分段待原文核实）
+
+# ===== 母材类组覆盖策略 =====
+# 并非所有类别的组别都适用"高组别覆盖低组别"：
+#   progressive: 组别按强度递进（如 Fe-1-1/1-2/1-3/1-4），高覆盖低
+#   parallel:    组别按成分并列（如 Fe-8-1不含Mo/Fe-8-2含Mo），互不覆盖
+#   none:        该类别不分组（如 Fe-6 马氏体），组别同类别号，仅自身覆盖
+base_metal_coverage:
+  Fe-1: progressive   # Fe-1-4 覆盖 Fe-1-1/1-2/1-3
+  Fe-2: progressive
+  Fe-3: progressive
+  Fe-4: progressive
+  Fe-7: parallel      # Fe-7-1/7-2 并列，互不覆盖
+  Fe-8: parallel      # Fe-8-1不含Mo / Fe-8-2含Mo 并列，互不覆盖
+  default: parallel   # 未列出的类别默认并列（保守，避免误覆盖）
+
+# ===== 母材厚度覆盖（对接焊缝）=====
+# 设评定试件厚度为 t(mm)，覆盖焊件母材厚度区间 [min, max]
+# impact=1 表示有冲击试验要求（由引擎传入），0 表示无。
+# ★表7规则：1.5≤t≤10 且有冲击时，上限由2t收紧为 t+1.5（2023/2011一致）
+thickness:
+  rules:
+    - if: "t < 1.5"
+      then: { min: t, max: "2*t" }
+    - if: "1.5 <= t and t <= 10"
+      then: { min: 1.5, max: "t + 1.5 if impact else 2*t" }
+    - if: "10 < t and t < 30"
+      then: { min: "max(5, 0.5*t)", max: "2*t" }
+    - if: "t >= 30"
+      then: { min: 5, max: "min(200, 2*t)" }
+
+# ===== 焊缝金属厚度覆盖（对接多层焊，与母材厚度分别计算）=====
+# 同表7：1.5≤t≤10 且有冲击时上限收紧为 t+1.5
+deposited_thickness:
+  rules:
+    - if: "t < 1.5"
+      then: { min: t, max: "2*t" }
+    - if: "1.5 <= t and t <= 10"
+      then: { min: 1.5, max: "t + 1.5 if impact else 2*t" }
+    - if: "10 < t and t < 30"
+      then: { min: "max(5, 0.5*t)", max: "2*t" }
+    - if: "t >= 30"
+      then: { min: 5, max: "min(200, 2*t)" }
+
+# ===== 管径覆盖（管对接）=====
+# 设评定试件外径为 d(mm)，覆盖焊件管径区间 [min, max]
+diameter:
+  rules:
+    - if: "d <= 25"
+      then: { min: d, max: null }
+    - if: "d > 25"
+      then: { min: "0.5*d", max: null }
+  note: 管径覆盖一般为 [d, +∞)；小管径分支见标准注（阶段2核实）
+
+# ===== 焊接位置覆盖（高难度覆盖低难度）=====
+# key = 合格位置代号，value = 可覆盖的位置代号列表
+# 板对接：4G(仰) ≥ 3G(立) ≥ 2G(横) ≥ 1G(平)
+# 管对接：6GR/6G 覆盖范围最大
+position:
+  covers:
+    "1G": ["1G"]                          # 板平焊：仅自身
+    "2G": ["1G", "2G"]                    # 横焊：覆盖平
+    "3G": ["1G", "3G"]                    # 立焊：覆盖平
+    "4G": ["1G", "2G", "3G", "4G"]        # 仰焊：覆盖平立横
+    "5G": ["1G(管)", "5G"]                # 管水平固定
+    "6G": ["1G(管)", "2G(管)", "5G", "6G"]  # 管45°固定：覆盖最广
+    "6GR": ["1G(管)", "2G(管)", "5G", "6G", "6GR"]  # 含限制环，T/K/Y接头
+  note: |
+    向上立焊为补加因素，需单独评定（见因素表 SMAW-S02/GTAW-S02）。
+    板/管互通规则阶段2核实。

@@ -1,0 +1,68 @@
+# NB/T 47014-2023 表6 埋弧焊(SAW)焊接工艺评定因素表
+# ★category 为语义键
+
+standard: NB/T 47014-2023
+source_table: 表6-SAW
+data_status: 阶段2（含语义键category）
+
+factors:
+  - id: SAW-E01
+    category: process_change
+    name: 增加或取消任一焊接方法
+    level: essential
+  - id: SAW-E02
+    category: base_metal_category
+    name: 母材类别号变更
+    level: essential
+  - id: SAW-E03
+    category: base_metal_group
+    name: 母材组别号变更（超出评定范围）
+    level: essential
+  - id: SAW-E04
+    category: consumable_class
+    name: 焊丝-焊剂组合分类（F分类/表4栏位）变更
+    level: essential
+  - id: SAW-E05
+    category: flux_class
+    name: 焊剂类别变更
+    level: essential
+  - id: SAW-E06
+    category: preheat
+    name: 预热温度降低（超出评定值50℃以上）
+    level: essential
+  - id: SAW-E07
+    category: preheat_cancel
+    name: 取消预热
+    level: essential
+  - id: SAW-E08
+    category: pwht
+    name: 焊后热处理类别/参数变更
+    level: essential
+  - id: SAW-E09
+    category: current_type
+    name: 电源类型（电流种类/极性）变更
+    level: essential
+    note: ★2023版升级为重要因素
+  - id: SAW-S01
+    category: diameter
+    name: 焊丝直径增大
+    level: supplemental
+  - id: SAW-S02
+    category: heat_input
+    name: 热输入（线能量）增大（超出评定值）
+    level: supplemental
+  - id: SAW-S03
+    category: multi_to_single_pass
+    name: 每面多道焊改为每面单道焊
+    level: supplemental
+    invalidate_when:
+      - PWHT_is_upper_transformation
+      - austenitic_solution_treated
+  - id: SAW-N01
+    category: groove
+    name: 坡口形式/尺寸变更
+    level: nonessential
+  - id: SAW-N03
+    category: wire_stickout
+    name: 焊丝伸出长度变更
+    level: nonessential

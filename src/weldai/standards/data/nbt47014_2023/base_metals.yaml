@@ -1,0 +1,655 @@
+standard: NB/T 47014-2023
+source_table: 表1
+data_status: 示例（待阶段2全文核实）
+base_metals:
+- grade: Q235B
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 700
+  yield_strength: 235
+  tensile_strength: 375
+  remark: 碳素结构钢，常用
+- grade: Q235C
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 700
+  yield_strength: 235
+  tensile_strength: 375
+- grade: '20'
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 699
+  yield_strength: 245
+  tensile_strength: 410
+  remark: 优质碳素结构钢
+- grade: 20G
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB 5310
+  yield_strength: 235
+  tensile_strength: 410
+  remark: 锅炉管
+- grade: Q245R
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 713
+  yield_strength: 245
+  tensile_strength: 400
+  remark: ★压力容器专用碳素钢（原20R/20g）
+- grade: L245
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 9711
+  yield_strength: 245
+  tensile_strength: 415
+  remark: 油气输送管线钢
+- grade: Q235A
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 700
+  yield_strength: 235
+  tensile_strength: 375
+  remark: 碳素结构钢A级
+- grade: Q235D
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 700
+  yield_strength: 235
+  tensile_strength: 375
+  remark: 碳素结构钢D级(低温冲击好)
+- grade: Q195
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 700
+  yield_strength: 195
+  tensile_strength: 315
+  remark: 碳素结构钢(较低强度)
+- grade: Q215
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 700
+  yield_strength: 215
+  tensile_strength: 335
+  remark: 碳素结构钢
+- grade: 15
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 699
+  yield_strength: 225
+  tensile_strength: 375
+  remark: 优质碳素结构钢
+- grade: 25
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 699
+  yield_strength: 275
+  tensile_strength: 450
+  remark: 优质碳素结构钢
+- grade: 20R
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB 6654
+  yield_strength: 245
+  tensile_strength: 400
+  remark: 旧牌号(已并入Q245R)
+- grade: L175
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 9711
+  yield_strength: 175
+  tensile_strength: 360
+  remark: 输送管线钢(A25)
+- grade: L210
+  family: Fe
+  category: Fe-1
+  group: Fe-1-1
+  standard: GB/T 9711
+  yield_strength: 210
+  tensile_strength: 335
+  remark: 输送管线钢(A级)
+- grade: 16MnDR
+  family: Fe
+  category: Fe-1
+  group: Fe-1-2
+  standard: GB/T 3531
+  yield_strength: 315
+  tensile_strength: 490
+  remark: 低温低合金钢(-40℃，Fe-1-2组)
+- grade: L290
+  family: Fe
+  category: Fe-1
+  group: Fe-1-2
+  standard: GB/T 9711
+  yield_strength: 290
+  tensile_strength: 415
+  remark: 输送管线钢(X42)
+- grade: L320
+  family: Fe
+  category: Fe-1
+  group: Fe-1-3
+  standard: GB/T 9711
+  yield_strength: 320
+  tensile_strength: 435
+  remark: 输送管线钢(X46)
+- grade: L360
+  family: Fe
+  category: Fe-1
+  group: Fe-1-3
+  standard: GB/T 9711
+  yield_strength: 360
+  tensile_strength: 460
+  remark: 输送管线钢(X52)
+- grade: L415
+  family: Fe
+  category: Fe-1
+  group: Fe-1-3
+  standard: GB/T 9711
+  yield_strength: 415
+  tensile_strength: 520
+  remark: 输送管线钢(X60)
+- grade: L485
+  family: Fe
+  category: Fe-1
+  group: Fe-1-4
+  standard: GB/T 9711
+  yield_strength: 485
+  tensile_strength: 570
+  remark: 输送管线钢(X70)
+- grade: L555
+  family: Fe
+  category: Fe-1
+  group: Fe-1-4
+  standard: GB/T 9711
+  yield_strength: 555
+  tensile_strength: 670
+  remark: 输送管线钢(X80)
+- grade: Q345B
+  family: Fe
+  category: Fe-1
+  group: Fe-1-2
+  standard: GB/T 1591
+  yield_strength: 345
+  tensile_strength: 510
+- grade: Q345R
+  family: Fe
+  category: Fe-1
+  group: Fe-1-2
+  standard: GB/T 713
+  yield_strength: 345
+  tensile_strength: 510
+  remark: ★压力容器用量最大的低合金钢（原16MnR）
+- grade: Q355
+  family: Fe
+  category: Fe-1
+  group: Fe-1-2
+  standard: GB/T 1591
+  yield_strength: 355
+  tensile_strength: 510
+- grade: Q390
+  family: Fe
+  category: Fe-1
+  group: Fe-1-3
+  standard: GB/T 1591
+  yield_strength: 390
+  tensile_strength: 530
+- grade: Q460
+  family: Fe
+  category: Fe-1
+  group: Fe-1-4
+  standard: GB/T 1591
+  yield_strength: 460
+  tensile_strength: 570
+- grade: Q295
+  family: Fe
+  category: Fe-2
+  group: Fe-2-1
+  standard: GB/T 1591
+  yield_strength: 295
+  tensile_strength: 430
+  remark: 含Nb/V/Ti/N微合金化控轧控冷钢（组别待原文核实）
+- grade: 09MnNiDR
+  family: Fe
+  category: Fe-3
+  group: Fe-3-1
+  standard: GB/T 3531
+  yield_strength: 260
+  tensile_strength: 430
+  remark: 低温低合金钢(-70℃)
+- grade: 15MnNiDR
+  family: Fe
+  category: Fe-3
+  group: Fe-3-1
+  standard: GB/T 3531
+  yield_strength: 280
+  tensile_strength: 450
+  remark: 低温低合金钢
+- grade: 15CrMoR
+  family: Fe
+  category: Fe-4
+  group: Fe-4-1
+  standard: GB/T 713
+  yield_strength: 295
+  tensile_strength: 440
+  remark: ★1Cr-0.5Mo耐热钢(Cr~1%)；Fe-4-1已确认
+- grade: 14Cr1MoR
+  family: Fe
+  category: Fe-4
+  group: Fe-4-1
+  standard: GB/T 713
+  yield_strength: 310
+  tensile_strength: 515
+  remark: 1.25Cr-0.5Mo
+- grade: 12Cr1MoVG
+  family: Fe
+  category: Fe-4
+  group: Fe-4-2
+  standard: GB 5310
+  yield_strength: 225
+  tensile_strength: 440
+  remark: 1Cr-0.5Mo-V（含V）；归Fe-4-2，与无V的15CrMoR(F-4-1)分组不同
+- grade: 12Cr2Mo1R
+  family: Fe
+  category: Fe-5
+  group: Fe-5A
+  standard: GB/T 713
+  yield_strength: 310
+  tensile_strength: 515
+  remark: ★2.25Cr-1Mo（临氢设备用，ASME Gr22）；Fe-5A已确认
+- grade: 12Cr2Mo1G
+  family: Fe
+  category: Fe-5
+  group: Fe-5A
+  standard: GB 9948
+  yield_strength: 280
+  tensile_strength: 450
+  remark: 2.25Cr-1Mo 管材
+- grade: 1Cr5Mo
+  family: Fe
+  category: Fe-5
+  group: Fe-5B-1
+  standard: GB 9948
+  yield_strength: 390
+  tensile_strength: 590
+  remark: 5Cr-0.5Mo(ASME P5/T5)；Fe-5B组1
+- grade: 10Cr9Mo1VNbN
+  family: Fe
+  category: Fe-5
+  group: Fe-5B-2
+  standard: GB 5310
+  yield_strength: 415
+  tensile_strength: 585
+  remark: ★P91/T91(9Cr-1Mo-V-Nb)；Fe-5B组2，与1Cr5Mo(F-5B-1)虽同5B但含V-Nb不可互换
+- grade: 06Cr13
+  family: Fe
+  category: Fe-6
+  group: Fe-6
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 440
+  remark: 0Cr13；马氏体不锈钢
+- grade: 12Cr13
+  family: Fe
+  category: Fe-6
+  group: Fe-6
+  standard: GB/T 1220
+  yield_strength: 345
+  tensile_strength: 540
+  remark: 1Cr13/410；马氏体不锈钢
+- grade: 20Cr13
+  family: Fe
+  category: Fe-6
+  group: Fe-6
+  standard: GB/T 1220
+  yield_strength: 440
+  tensile_strength: 640
+  remark: 2Cr13/420；马氏体不锈钢
+- grade: 14Cr17Ni2
+  family: Fe
+  category: Fe-6
+  group: Fe-6
+  standard: GB/T 1220
+  yield_strength: None
+  tensile_strength: 1080
+  remark: 1Cr17Ni2/431；马氏体不锈钢
+- grade: 05Cr17Ni4Cu4Nb
+  family: Fe
+  category: Fe-6
+  group: Fe-6
+  standard: GB/T 1220
+  yield_strength: 725
+  tensile_strength: 930
+  remark: ★17-4PH/630；马氏体沉淀硬化不锈钢(ASME P-No.6)，固溶后马氏体基体
+- grade: 06Cr13Al
+  family: Fe
+  category: Fe-7
+  group: Fe-7-1
+  standard: GB/T 24511
+  yield_strength: 170
+  tensile_strength: 410
+  remark: 0Cr13Al/405；铁素体不锈钢
+- grade: 022Cr11Ti
+  family: Fe
+  category: Fe-7
+  group: Fe-7-1
+  standard: GB/T 24511
+  yield_strength: 175
+  tensile_strength: 380
+  remark: 铁素体不锈钢
+- grade: 10Cr17
+  family: Fe
+  category: Fe-7
+  group: Fe-7-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 450
+  remark: 1Cr17/430；铁素体不锈钢（较高Cr）
+- grade: 022Cr18Ti
+  family: Fe
+  category: Fe-7
+  group: Fe-7-2
+  standard: GB/T 24511
+  yield_strength: 175
+  tensile_strength: 380
+  remark: 铁素体不锈钢
+- grade: 07Cr17Ni7Al
+  family: Fe
+  category: Fe-7
+  group: Fe-7-2
+  standard: GB/T 1220
+  yield_strength: None
+  tensile_strength: 930
+  remark: ★17-7PH/631；半奥氏体沉淀硬化不锈钢(ASME P-No.7)，归Fe-7
+- grade: 06Cr19Ni10
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: ★304/S30408；奥氏体不锈钢(不含Mo)
+- grade: 022Cr19Ni10
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: ★304L/S30403；超低碳奥氏体(不含Mo)
+- grade: 07Cr19Ni10
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 304H/S30409；高碳奥氏体(不含Mo)
+- grade: 06Cr18Ni11Ti
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 321/S32168；Ti稳定化奥氏体(不含Mo)
+- grade: 06Cr18Ni11Nb
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 347/S34779；Nb稳定化奥氏体(不含Mo)
+- grade: 022Cr18Ni11Ti
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 321L；超低碳Ti稳定化奥氏体(不含Mo)
+- grade: 06Cr25Ni20
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 310S/S31008；高铬镍耐热奥氏体(不含Mo)
+- grade: 022Cr19Ni10N
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 550
+  remark: 304LN/S30453；超低碳含氮奥氏体(不含Mo)
+- grade: 022Cr19Ni11Nb
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 347L；超低碳Nb稳定化奥氏体(不含Mo)
+- grade: S30408
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: ISC统一数字代号(=06Cr19Ni10/304)
+- grade: S30403
+  family: Fe
+  category: Fe-8
+  group: Fe-8-1
+  standard: GB/T 24511
+  yield_strength: 175
+  tensile_strength: 480
+  remark: ISC代号(=022Cr19Ni10/304L)
+- grade: 06Cr17Ni12Mo2
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: ★316/S31608；奥氏体不锈钢(含Mo)
+- grade: 022Cr17Ni12Mo2
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: ★316L/S31603；超低碳奥氏体(含Mo)
+- grade: 07Cr17Ni12Mo2
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 316H/S31609；高碳奥氏体(含Mo)
+- grade: 06Cr19Ni13Mo3
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 317/S31708；高Mo奥氏体
+- grade: 022Cr19Ni13Mo3
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: 317L/S31703；超低碳高Mo奥氏体
+- grade: 022Cr17Ni12Mo2N
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 275
+  tensile_strength: 550
+  remark: 316LN/S31653；超低碳含氮含Mo奥氏体
+- grade: 06Cr17Ni12Mo2Ti
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 530
+  remark: 316Ti/S31635；Ti稳定化含Mo奥氏体
+- grade: S31608
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 520
+  remark: ISC代号(=06Cr17Ni12Mo2/316)
+- grade: S31603
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 175
+  tensile_strength: 485
+  remark: ISC代号(=022Cr17Ni12Mo2/316L)
+- grade: S31703
+  family: Fe
+  category: Fe-8
+  group: Fe-8-2
+  standard: GB/T 24511
+  yield_strength: 205
+  tensile_strength: 515
+  remark: ISC代号(=022Cr19Ni13Mo3/317L)
+- grade: 022Cr22Ni5Mo3N
+  family: Fe
+  category: Fe-10H
+  group: Fe-10H
+  standard: GB/T 24511
+  yield_strength: 450
+  tensile_strength: 620
+  remark: S31803/1.4462；双相不锈钢(ASME P-No.10H)
+- grade: 022Cr23Ni5Mo3N
+  family: Fe
+  category: Fe-10H
+  group: Fe-10H
+  standard: GB/T 24511
+  yield_strength: 450
+  tensile_strength: 655
+  remark: ★S32205/2205；双相不锈钢(ASME P-No.10H)，已确认归Fe-10H非Fe-8
+- grade: 022Cr25Ni7Mo4N
+  family: Fe
+  category: Fe-10H
+  group: Fe-10H
+  standard: GB/T 24511
+  yield_strength: 550
+  tensile_strength: 795
+  remark: S32750/2507；超级双相不锈钢(ASME P-No.10H)
+- grade: 1060
+  family: Al
+  category: Al-1
+  group: Al-1
+  standard: GB/T 3880
+  yield_strength: 25
+  tensile_strength: 70
+  remark: 工业纯铝(ASME P-No.21)
+- grade: 5052
+  family: Al
+  category: Al-3
+  group: Al-3
+  standard: GB/T 3880
+  yield_strength: 90
+  tensile_strength: 195
+  remark: Al-Mg系防锈铝(ASME P-No.23)
+- grade: 6061
+  family: Al
+  category: Al-5
+  group: Al-5
+  standard: GB/T 3880
+  yield_strength: 145
+  tensile_strength: 240
+  remark: Al-Mg-Si系锻铝(ASME P-No.25)，组别待原文核实
+- grade: TA1
+  family: Ti
+  category: Ti-1
+  group: Ti-1
+  standard: GB/T 3621
+  yield_strength: 240
+  tensile_strength: 370
+  remark: 工业纯钛(ASME P-No.51)
+- grade: TA2
+  family: Ti
+  category: Ti-1
+  group: Ti-1
+  standard: GB/T 3621
+  yield_strength: 320
+  tensile_strength: 440
+  remark: 工业纯钛(ASME P-No.51)
+- grade: TC4
+  family: Ti
+  category: Ti-2
+  group: Ti-2
+  standard: GB/T 3621
+  yield_strength: 825
+  tensile_strength: 950
+  remark: Ti-6Al-4V α+β型(ASME P-No.52/53)，组别待原文核实
+- grade: T2
+  family: Cu
+  category: Cu-1
+  group: Cu-1
+  standard: GB/T 2040
+  yield_strength: 50
+  tensile_strength: 215
+  remark: 纯铜(ASME P-No.31)
+- grade: H62
+  family: Cu
+  category: Cu-2
+  group: Cu-2
+  standard: GB/T 2040
+  yield_strength: 150
+  tensile_strength: 370
+  remark: 黄铜(ASME P-No.32)
+- grade: N6
+  family: Ni
+  category: Ni-1
+  group: Ni-1
+  standard: GB/T 2882
+  yield_strength: 85
+  tensile_strength: 380
+  remark: 纯镍(ASME P-No.41)
+- grade: NS312
+  family: Ni
+  category: Ni-2
+  group: Ni-2
+  standard: GB/T 15011
+  yield_strength: 240
+  tensile_strength: 585
+  remark: Inconel 600 Ni-Cr-Fe(ASME P-No.42)
+- grade: R60702
+  family: Zr
+  category: Zr-1
+  group: Zr-1
+  standard: GB/T 26283
+  yield_strength: 207
+  tensile_strength: 379
+  remark: 非合金锆(ASME P-No.61)；2023版新增评定内容

@@ -1,0 +1,84 @@
+# NB/T 47014-2023 表6 钨极氩弧焊(GTAW)焊接工艺评定因素表
+# ★category 为语义键，供引擎跨方法查找
+
+standard: NB/T 47014-2023
+source_table: 表6-GTAW
+data_status: 阶段2（含语义键category）
+
+factors:
+  - id: GTAW-E01
+    category: process_change
+    name: 增加或取消任一焊接方法
+    level: essential
+  - id: GTAW-E02
+    category: base_metal_category
+    name: 母材类别号变更
+    level: essential
+  - id: GTAW-E03
+    category: base_metal_group
+    name: 母材组别号变更（超出评定范围）
+    level: essential
+  - id: GTAW-E04
+    category: consumable_class
+    name: 填充金属类别（分类栏位）变更
+    level: essential
+  - id: GTAW-E05
+    category: gas_type
+    name: 保护气体种类变更
+    level: essential
+    note: GTAW特有
+  - id: GTAW-E06
+    category: backing_gas
+    name: 背面保护气取消或种类变更
+    level: essential
+  - id: GTAW-E07
+    category: preheat
+    name: 预热温度降低（超出评定值50℃以上）
+    level: essential
+  - id: GTAW-E08
+    category: preheat_cancel
+    name: 取消预热
+    level: essential
+  - id: GTAW-E09
+    category: pwht
+    name: 焊后热处理类别/参数变更
+    level: essential
+  - id: GTAW-E10
+    category: current_type
+    name: 电源类型（电流种类/极性）变更
+    level: essential
+    note: ★2023版升级为重要因素；变极性(VP)为独立电流种类
+  - id: GTAW-S01
+    category: diameter
+    name: 焊丝/填充丝直径增大
+    level: supplemental
+  - id: GTAW-S02
+    category: position_vertical
+    name: 焊接位置改为向上立焊
+    level: supplemental
+    invalidate_when:
+      - PWHT_is_upper_transformation
+      - austenitic_solution_treated
+  - id: GTAW-S03
+    category: multi_to_single_pass
+    name: 每面多道焊改为每面单道焊
+    level: supplemental
+    invalidate_when:
+      - PWHT_is_upper_transformation
+      - austenitic_solution_treated
+  - id: GTAW-S04
+    category: heat_input
+    name: 热输入（线能量）增大（超出评定值）
+    level: supplemental
+  - id: GTAW-N01
+    category: groove
+    name: 坡口形式/尺寸变更
+    level: nonessential
+  - id: GTAW-N02
+    category: tungsten
+    name: 钨极直径/型号变更
+    level: nonessential
+  - id: GTAW-N05
+    category: gas_flow
+    name: 保护气体流量变更
+    level: nonessential

@@ -1,0 +1,53 @@
+# NB/T 47014-2023 表6 气电立焊(EGW)因素表
+# ★category 为语义键
+
+standard: NB/T 47014-2023
+source_table: 表6-EGW
+data_status: 阶段2（含语义键category）
+
+factors:
+  - id: EGW-E01
+    category: process_change
+    name: 增加或取消任一焊接方法
+    level: essential
+  - id: EGW-E02
+    category: base_metal_category
+    name: 母材类别号/组别号变更
+    level: essential
+  - id: EGW-E03
+    category: consumable_class
+    name: 焊丝类别号变更
+    level: essential
+  - id: EGW-E04
+    category: gas_type
+    name: 保护气体种类/配比变更
+    level: essential
+  - id: EGW-E05
+    category: preheat
+    name: 预热温度降低/取消预热
+    level: essential
+  - id: EGW-E06
+    category: pwht
+    name: 焊后热处理类别/参数变更
+    level: essential
+  - id: EGW-E07
+    category: current_type
+    name: 电源类型（电流种类/极性）变更
+    level: essential
+  - id: EGW-S01
+    category: groove
+    name: 坡口形式和间隙变更
+    level: supplemental
+    note: ★2023版新增补加因素
+  - id: EGW-S02
+    category: heat_input
+    name: 热输入（线能量）增大
+    level: supplemental
+  - id: EGW-S03
+    category: position_vertical
+    name: 焊接位置（立焊方向）变更
+    level: supplemental
+  - id: EGW-N01
+    category: oscillation
+    name: 摆动参数变更
+    level: nonessential

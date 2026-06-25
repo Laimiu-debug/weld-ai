@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weldai"
+version = "0.1.0"
+description = "weldAI - 国内压力容器焊接管理平台（WPS/工艺评定/焊工管理）"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "weldAI" }]
+
+dependencies = [
+    "PySide6>=6.6",
+    "SQLAlchemy>=2.0",
+    "PyYAML>=6.0",
+    "reportlab>=4.0",
+    "python-docx>=1.1",
+    "matplotlib>=3.8",
+    "requests>=2.31",
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-qt>=4.4",
+    "pyinstaller>=6.0",
+]
+build = [
+    "nuitka>=2.0",
+]
+
+[project.scripts]
+weldai = "weldai.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"weldai.standards" = ["data/**/*.yaml"]
+"weldai.assets" = ["fonts/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

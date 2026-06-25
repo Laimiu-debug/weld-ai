@@ -1,0 +1,84 @@
+# NB/T 47014-2023 表6 焊条电弧焊(SMAW)焊接工艺评定因素表
+#
+# ★category 字段（阶段优化新增）：稳定的语义键，供 factor_engine 跨方法查找。
+#   引擎按 category(如 current_type/preheat/position_vertical) 查找因素，
+#   而非硬编码 ID(如 SMAW-E08)，避免不同方法ID偏移导致校验失效。
+#
+# level: essential(重要)/supplemental(补加)/nonessential(次要)
+# invalidate_when: 补加因素的条件性失效条件名
+
+standard: NB/T 47014-2023
+source_table: 表6-SMAW
+data_status: 阶段2（含语义键category）
+
+factors:
+  # ===== 重要因素 =====
+  - id: SMAW-E01
+    category: process_change
+    name: 增加或取消任一焊接方法
+    level: essential
+  - id: SMAW-E02
+    category: base_metal_category
+    name: 母材类别号变更
+    level: essential
+  - id: SMAW-E03
+    category: base_metal_group
+    name: 母材组别号变更（超出评定范围）
+    level: essential
+  - id: SMAW-E04
+    category: consumable_class
+    name: 焊材类别（分类栏位）变更
+    level: essential
+  - id: SMAW-E05
+    category: preheat
+    name: 预热温度降低（超出评定值50℃以上）
+    level: essential
+  - id: SMAW-E06
+    category: preheat_cancel
+    name: 取消预热
+    level: essential
+  - id: SMAW-E07
+    category: pwht
+    name: 焊后热处理类别/参数变更
+    level: essential
+  - id: SMAW-E08
+    category: current_type
+    name: 电源类型（电流种类/极性）变更
+    level: essential
+    note: ★2023版从次要因素升级为重要因素
+  # ===== 补加因素 =====
+  - id: SMAW-S01
+    category: diameter
+    name: 焊条直径增大
+    level: supplemental
+  - id: SMAW-S02
+    category: position_vertical
+    name: 焊接位置改为向上立焊
+    level: supplemental
+    invalidate_when:
+      - PWHT_is_upper_transformation
+      - austenitic_solution_treated
+  - id: SMAW-S03
+    category: multi_to_single_pass
+    name: 每面多道焊改为每面单道焊
+    level: supplemental
+    invalidate_when:
+      - PWHT_is_upper_transformation
+      - austenitic_solution_treated
+  - id: SMAW-S04
+    category: heat_input
+    name: 热输入（线能量）增大（超出评定值）
+    level: supplemental
+  # ===== 次要因素 =====
+  - id: SMAW-N01
+    category: groove
+    name: 坡口形式变更
+    level: nonessential
+  - id: SMAW-N02
+    category: groove_dimension
+    name: 坡口尺寸（角度/钝边/根部间隙）变更
+    level: nonessential
+  - id: SMAW-N03
+    category: consumable_brand
+    name: 焊条牌号变更（同分类栏位内）
+    level: nonessential

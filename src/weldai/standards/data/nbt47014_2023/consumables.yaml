@@ -1,0 +1,544 @@
+standard: NB/T 47014-2023
+source_table: 表2/3/4
+data_status: 阶段2（常用牌号，待补全）
+consumables:
+- brand: J422
+  model: E4303
+  type: electrode
+  classification_slot: 表2-E43
+  standard: GB/T 5117
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-1
+  remark: 钛钙型碳钢焊条，最常用 [可用直径φ3.2/φ2.5/φ4]
+- brand: J427
+  model: E4315
+  type: electrode
+  classification_slot: 表2-E43
+  standard: GB/T 5117
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-1
+  remark: 低氢型碳钢焊条（直流反接） [可用直径φ3.2/φ4]
+- brand: J507
+  model: E5015
+  type: electrode
+  classification_slot: 表2-E50
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-2
+  - Fe-1-1
+  remark: ★低氢低合金焊条，Q345R常用（直流反接） [可用直径φ3.2/φ4]
+- brand: J506
+  model: E5016
+  type: electrode
+  classification_slot: 表2-E50
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-2
+  - Fe-1-1
+  remark: 低氢钾型低合金焊条（交直流）
+- brand: J557
+  model: E5515-G
+  type: electrode
+  classification_slot: 表2-E55
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-3
+  - Fe-1-2
+  remark: 540MPa级低合金焊条
+- brand: J607
+  model: E6015-G
+  type: electrode
+  classification_slot: 表2-E60
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-4
+  - Fe-1-3
+  remark: 590MPa级低合金焊条
+- brand: R307
+  model: E5515-B2
+  type: electrode
+  classification_slot: 表2-E55-B2
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-4-1
+  remark: 1Cr-0.5Mo耐热钢焊条(15CrMo用)
+- brand: R407
+  model: E6215-B3
+  type: electrode
+  classification_slot: 表2-E62-B3
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-5A
+  remark: 2.25Cr-1Mo耐热钢焊条(12Cr2Mo1用)
+- brand: A102
+  model: E308-16
+  type: electrode
+  classification_slot: 表2-E308
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 钛钙型304不锈钢焊条 [可用直径φ3.2/φ2.5/φ4]
+- brand: A002
+  model: E308L-16
+  type: electrode
+  classification_slot: 表2-E308L
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 超低碳304L不锈钢焊条 [可用直径φ3.2/φ4]
+- brand: A132
+  model: E347-16
+  type: electrode
+  classification_slot: 表2-E347
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: Nb稳定化321/347不锈钢焊条
+- brand: A202
+  model: E316-16
+  type: electrode
+  classification_slot: 表2-E316
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-2
+  remark: 含Mo 316不锈钢焊条 [可用直径φ3.2/φ4]
+- brand: A022
+  model: E316L-16
+  type: electrode
+  classification_slot: 表2-E316L
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-2
+  remark: 超低碳含Mo 316L不锈钢焊条 [可用直径φ3.2/φ4]
+- brand: A302
+  model: E309-16
+  type: electrode
+  classification_slot: 表2-E309
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 异种钢/堆焊过渡层用（高合金过渡）
+- brand: A062
+  model: E309L-16
+  type: electrode
+  classification_slot: 表2-E309L
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 超低碳过渡层焊条
+- brand: W707
+  model: E5515-C1
+  type: electrode
+  classification_slot: 表2-E55-C1
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-3-1
+  remark: -70℃低温钢焊条(09MnNiDR用)
+- brand: ER50-6
+  model: ER50-6
+  type: wire
+  classification_slot: 表3-ER50
+  standard: GB/T 8110
+  diameter: 1.2
+  applicable_groups:
+  - Fe-1-1
+  - Fe-1-2
+  remark: ★MAG气保焊实心焊丝，碳钢最常用
+- brand: ER49-1
+  model: ER49-1
+  type: wire
+  classification_slot: 表3-ER49
+  standard: GB/T 8110
+  diameter: 1.2
+  applicable_groups:
+  - Fe-1-1
+  remark: MG49-1气保焊焊丝
+- brand: ER55-G
+  model: ER55-G
+  type: wire
+  classification_slot: 表3-ER55
+  standard: GB/T 8110
+  diameter: 1.2
+  applicable_groups:
+  - Fe-1-3
+  - Fe-1-2
+  remark: 550MPa级气保焊焊丝
+- brand: ER308
+  model: ER308
+  type: wire
+  classification_slot: 表3-ER308
+  standard: GB/T 4240
+  diameter: 2.0
+  applicable_groups:
+  - Fe-8-1
+  remark: 304不锈钢TIG/MIG焊丝 [可用直径φ2.0/φ1]
+- brand: ER308L
+  model: ER308L
+  type: wire
+  classification_slot: 表3-ER308L
+  standard: GB/T 4240
+  diameter: 2.0
+  applicable_groups:
+  - Fe-8-1
+  remark: 304L超低碳不锈钢焊丝
+- brand: ER316
+  model: ER316
+  type: wire
+  classification_slot: 表3-ER316
+  standard: GB/T 4240
+  diameter: 2.0
+  applicable_groups:
+  - Fe-8-2
+  remark: 316含Mo不锈钢焊丝
+- brand: ER316L
+  model: ER316L
+  type: wire
+  classification_slot: 表3-ER316L
+  standard: GB/T 4240
+  diameter: 2.0
+  applicable_groups:
+  - Fe-8-2
+  remark: 316L超低碳含Mo不锈钢焊丝 [可用直径φ2.0/φ1]
+- brand: ER309
+  model: ER309
+  type: wire
+  classification_slot: 表3-ER309
+  standard: GB/T 4240
+  diameter: 2.0
+  applicable_groups:
+  - Fe-8-1
+  remark: 异种钢过渡层焊丝
+- brand: ER55-B2
+  model: ER55-B2
+  type: wire
+  classification_slot: 表3-ER55-B2
+  standard: GB/T 8110
+  diameter: 2.0
+  applicable_groups:
+  - Fe-4-1
+  remark: 1Cr-0.5Mo耐热钢焊丝(15CrMoR用)
+- brand: ER55-B3L
+  model: ER55-B3L
+  type: wire
+  classification_slot: 表3-ER55-B3L
+  standard: GB/T 8110
+  diameter: 2.0
+  applicable_groups:
+  - Fe-5A
+  remark: 2.25Cr-1Mo耐热钢焊丝(12Cr2Mo1R用)，超低氢
+- brand: ER2209
+  model: ER2209
+  type: wire
+  classification_slot: 表3-ER2209
+  standard: GB/T 4240
+  diameter: 2.0
+  applicable_groups:
+  - Fe-10H
+  remark: 2205双相钢焊丝(对应UNS S39209)
+- brand: ER55-C1
+  model: ER55-C1
+  type: wire
+  classification_slot: 表3-ER55-C1
+  standard: GB/T 8110
+  diameter: 1.2
+  applicable_groups:
+  - Fe-3-1
+  remark: -70℃低温钢焊丝(09MnNiDR用)
+- brand: R317
+  model: E5515-B2-V
+  type: electrode
+  classification_slot: 表2-E55-B2-V
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-4-2
+  remark: 1Cr-0.5Mo-V耐热钢焊条(12Cr1MoVG用) [可用直径φ3.2/φ4]
+- brand: R507
+  model: E5MoV-15
+  type: electrode
+  classification_slot: 表2-E5MoV
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-5B-1
+  remark: 5Cr-0.5Mo耐热钢焊条(1Cr5Mo用)
+- brand: R717
+  model: E9Mo-15
+  type: electrode
+  classification_slot: 表2-E9Mo
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-5B-2
+  remark: 9Cr-1Mo型耐热钢焊条(P91用，含V-Nb改进型见R717A)
+- brand: A242
+  model: E447-16
+  type: electrode
+  classification_slot: 表2-E447
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-10H
+  remark: 双相不锈钢焊条(2205用)
+- brand: H08A
+  model: H08A
+  type: wire
+  classification_slot: 表4-H08A
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-1
+  remark: 埋弧焊/气焊焊丝(配HJ431焊剂)
+- brand: H08MnA
+  model: H08MnA
+  type: wire
+  classification_slot: 表4-H08MnA
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-2
+  - Fe-1-1
+  remark: ★Q345R埋弧焊焊丝
+- brand: H10Mn2
+  model: H10Mn2
+  type: wire
+  classification_slot: 表4-H10Mn2
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-2
+  - Fe-1-3
+  remark: 低合金钢埋弧焊焊丝
+- brand: F48A2-H08MnA
+  model: F48A2-H08MnA
+  type: combo
+  classification_slot: 表4-F48A2-H08MnA
+  standard: GB/T 5293
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-2
+  remark: 抗拉≥480MPa/焊态/冲击≥27J@-20℃/配H08MnA
+- brand: F55A4-H08MnMoA
+  model: F55A4-H08MnMoA
+  type: combo
+  classification_slot: 表4-F55A4-H08MnMoA
+  standard: GB/T 12470
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-3
+  - Fe-1-2
+  remark: 抗拉≥550MPa/焊态/冲击≥27J@-40℃/配H08MnMoA
+- brand: HJ431
+  model: HJ431
+  type: flux
+  classification_slot: 表4-HJ431
+  standard: GB/T 5293
+  diameter: 0
+  applicable_groups:
+  - Fe-1-1
+  - Fe-1-2
+  remark: 熔炼型焊剂，碳钢埋弧焊常用
+- brand: SJ101
+  model: SJ101
+  type: flux
+  classification_slot: 表4-SJ101
+  standard: GB/T 12470
+  diameter: 0
+  applicable_groups:
+  - Fe-1-2
+  - Fe-1-3
+  remark: 氟碱型烧结焊剂，低合金钢埋弧焊
+- brand: J507Ni
+  model: E5015-G
+  type: electrode
+  classification_slot: 表2-E50-G
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-2
+  remark: 低温钢用J507改进型(高韧性)
+- brand: J507Mo
+  model: E5015-G
+  type: electrode
+  classification_slot: 表2-E50-G
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-2
+  - Fe-1-3
+  remark: 耐蚀低合金焊条(含Mo)
+- brand: A107
+  model: E308-15
+  type: electrode
+  classification_slot: 表2-E308
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 304焊条(低氢型/直流)
+- brand: A212
+  model: E318-16
+  type: electrode
+  classification_slot: 表2-E318
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-2
+  remark: 含Nb含Mo不锈钢焊条(318)
+- brand: A402
+  model: E310-16
+  type: electrode
+  classification_slot: 表2-E310
+  standard: GB/T 983
+  diameter: 3.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 25-20型耐热不锈钢焊条(310)
+- brand: R207
+  model: E5515-B1
+  type: electrode
+  classification_slot: 表2-E55-B1
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-4-1
+  remark: 0.5Cr-0.5Mo耐热钢焊条
+- brand: W607
+  model: E5515-C2
+  type: electrode
+  classification_slot: 表2-E55-C2
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-3-1
+  remark: -60℃低温钢焊条
+- brand: W807
+  model: E5515-C1L
+  type: electrode
+  classification_slot: 表2-E55-C1L
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-3-1
+  remark: -80℃超低温钢焊条
+- brand: J507GR
+  model: E5015-G
+  type: electrode
+  classification_slot: 表2-E50-G
+  standard: GB/T 5118
+  diameter: 3.2
+  applicable_groups:
+  - Fe-1-2
+  remark: 高韧性低合金焊条(低温冲击好)
+- brand: YJ501-1
+  model: E501T-1
+  type: wire
+  classification_slot: 表3-E501T
+  standard: GB/T 10045
+  diameter: 1.2
+  applicable_groups:
+  - Fe-1-1
+  - Fe-1-2
+  remark: 钛型药芯焊丝(气保护)，碳钢用
+- brand: YJ502-1
+  model: E501T-5
+  type: wire
+  classification_slot: 表3-E501T
+  standard: GB/T 10045
+  diameter: 1.2
+  applicable_groups:
+  - Fe-1-1
+  - Fe-1-2
+  remark: 碱性药芯焊丝(气保护)，低氢
+- brand: YA308L-1
+  model: E308LT-1
+  type: wire
+  classification_slot: 表3-E308LT
+  standard: GB/T 17853
+  diameter: 1.2
+  applicable_groups:
+  - Fe-8-1
+  remark: 304L不锈钢药芯焊丝
+- brand: H08MnMoA
+  model: H08MnMoA
+  type: wire
+  classification_slot: 表4-H08MnMoA
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-3
+  - Fe-1-2
+  remark: 含Mo低合金埋弧焊焊丝
+- brand: H08Mn2MoA
+  model: H08Mn2MoA
+  type: wire
+  classification_slot: 表4-H08Mn2MoA
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-1-3
+  - Fe-1-4
+  remark: 高强低合金埋弧焊焊丝
+- brand: H08CrMoA
+  model: H08CrMoA
+  type: wire
+  classification_slot: 表4-H08CrMoA
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-4-1
+  remark: Cr-Mo耐热钢埋弧焊焊丝
+- brand: H08Cr2MoA
+  model: H08Cr2MoA
+  type: wire
+  classification_slot: 表4-H08Cr2MoA
+  standard: GB/T 14957
+  diameter: 4.0
+  applicable_groups:
+  - Fe-5A
+  remark: 2.25Cr-1Mo埋弧焊焊丝
+- brand: SA1-4043
+  model: ER4043
+  type: wire
+  classification_slot: 表3-ER4043
+  standard: GB/T 10858
+  diameter: 1.6
+  applicable_groups:
+  - Al-1
+  - Al-5
+  remark: 铝硅合金焊丝(Al-Si系)
+- brand: SA1-5356
+  model: ER5356
+  type: wire
+  classification_slot: 表3-ER5356
+  standard: GB/T 10858
+  diameter: 1.6
+  applicable_groups:
+  - Al-3
+  - Al-5
+  remark: 铝镁合金焊丝(Al-Mg系)
+- brand: STA1R
+  model: ERTA1
+  type: wire
+  classification_slot: 表3-ERTA1
+  standard: GB/T 3623
+  diameter: 2.0
+  applicable_groups:
+  - Ti-1
+  remark: 工业纯钛焊丝(TA1)

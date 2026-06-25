@@ -1,0 +1,52 @@
+# NB/T 47014-2023 表6 电子束焊(EBW)因素表（2023版首次纳入）
+# ★category 为语义键
+
+standard: NB/T 47014-2023
+source_table: 表6-EBW
+data_status: 阶段2（含语义键category，逐行分级待原文核实）
+
+factors:
+  - id: EBW-E01
+    category: base_metal_category
+    name: 母材类别号/组别号变更
+    level: essential
+  - id: EBW-E02
+    category: accelerating_voltage
+    name: 加速电压变更
+    level: essential
+  - id: EBW-E03
+    category: beam_current
+    name: 电子束流变更
+    level: essential
+  - id: EBW-E04
+    category: travel_speed
+    name: 焊接速度变更（超出评定范围）
+    level: essential
+  - id: EBW-E05
+    category: vacuum
+    name: 真空度变更（高真空↔低真空↔非真空）
+    level: essential
+  - id: EBW-E06
+    category: weld_mode
+    name: 焊接模式变更（深熔↔浅熔）
+    level: essential
+  - id: EBW-E07
+    category: consumable_class
+    name: 填充金属 添加↔不添加
+    level: essential
+  - id: EBW-E08
+    category: pwht
+    name: 焊后热处理类别/参数变更
+    level: essential
+  - id: EBW-S01
+    category: focus
+    name: 聚焦电流/焦点位置变更
+    level: supplemental
+  - id: EBW-N01
+    category: beam_deflection
+    name: 电子束偏转/扫描参数变更
+    level: nonessential
+  - id: EBW-N03
+    category: position
+    name: 焊接位置变更
+    level: nonessential

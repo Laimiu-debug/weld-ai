@@ -186,19 +186,49 @@ class NBT47014_2023Profile(StandardProfile):
         """焊材分类栏位变更判定。栏位相同 → 未变更（不触发重要因素）。"""
         return qualified_slot.strip() != target_slot.strip()
 
+    def _merged_consumables(self) -> dict[str, Consumable]:
+        """合并内置(YAML)与用户自定义(DB)焊材，DB 覆盖同名内置。
+
+        懒加载：查询时实时合并，确保用户新增焊材立即可见。
+        DB 未初始化（如纯单元测试）时回退为仅内置。
+        """
+        merged = dict(self._consumables)  # 先内置
+        try:
+            from ..persistence import get_session, ConsumableRepository
+            session = get_session()
+            repo = ConsumableRepository(session)
+            for c in repo.list_all():
+                merged[c.brand] = c  # DB 覆盖同名内置
+        except Exception:
+            # DB 未初始化（测试场景）—— 仅返回内置
+            pass
+        return merged
+
     def get_consumable(self, brand: str) -> Consumable | None:
-        """按牌号查焊材。"""
-        return self._consumables.get(brand)
+        """按牌号查焊材（含用户自定义）。"""
+        return self._merged_consumables().get(brand)
 
     def all_consumables(self) -> list[Consumable]:
-        """全部焊材（按牌号排序）。"""
-        return sorted(self._consumables.values(), key=lambda c: c.brand)
+        """全部焊材（内置+用户自定义，按牌号排序）。"""
+        return sorted(self._merged_consumables().values(), key=lambda c: c.brand)
 
     def consumables_for_group(self, group: str) -> list[Consumable]:
         """查适用某母材类组的焊材。"""
         return [
-            c for c in self._consumables.values()
+            c for c in self._merged_consumables().values()
             if group in c.applicable_groups
+        ]
+
+    def consumables_for_process(self, process: WeldingProcess | str) -> list[Consumable]:
+        """查适用某焊接方法的焊材。
+
+        按焊材的 applicable_processes() 过滤（优先显式 processes 字段，
+        为空时按 type 回退：electrode→SMAW、wire→GTAW/GMAW/FCAW、combo→SAW）。
+        """
+        proc = process.value if hasattr(process, "value") else str(process)
+        return [
+            c for c in self._merged_consumables().values()
+            if proc in c.applicable_processes()
         ]
 
     # ----- 焊接工艺评定因素 ----------------------------------------------

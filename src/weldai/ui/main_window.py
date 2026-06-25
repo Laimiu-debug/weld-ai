@@ -39,6 +39,7 @@ from ..standards import (
 from .procedure_dialog import ProcedureDialog
 from .welder_view import WelderView
 from .cost_view import CostView
+from .consumable_view import ConsumableView
 from .ai_view import AIView
 from .trace_view import TraceView
 
@@ -377,6 +378,8 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.ai_view, "🤖 AI 辅助")
         self.trace_view = TraceView()
         self.tabs.addTab(self.trace_view, "🔩 焊缝追溯")
+        self.consumable_view = ConsumableView()
+        self.tabs.addTab(self.consumable_view, "📚 焊材库")
         # 切换到 AI 标签页时刷新 PQR 下拉
         self.tabs.currentChanged.connect(self._on_tab_changed)
         root.addWidget(self.tabs, stretch=1)

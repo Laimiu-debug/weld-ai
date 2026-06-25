@@ -408,7 +408,15 @@ class ProcedureDialog(QDialog):
     ) -> None:
         row = self.cons_table.rowCount()
         self.cons_table.insertRow(row)
-        self.cons_table.setItem(row, 0, QTableWidgetItem(brand))
+        # 牌号：可编辑下拉 + 智能匹配（从焊材库加载，便于选标准库焊材）
+        brand_combo = QComboBox()
+        brand_combo.setEditable(True)
+        brand_combo.addItems(self._library_brands())
+        brand_combo.setCurrentText(brand)
+        self.cons_table.setCellWidget(row, 0, brand_combo)
+        # 型号/分类栏位联动：牌号变化时从库中查找
+        brand_combo.currentTextChanged.connect(
+            lambda t, r=row: self._on_brand_changed(r, t))
         self.cons_table.setItem(row, 1, QTableWidgetItem(model))
         self.cons_table.setItem(row, 2, QTableWidgetItem(slot))
         dia = QDoubleSpinBox()
@@ -419,6 +427,34 @@ class ProcedureDialog(QDialog):
             type_combo.addItem(t.cn, t)
         type_combo.setCurrentText(ctype.cn)
         self.cons_table.setCellWidget(row, 4, type_combo)
+
+    def _library_brands(self) -> list[str]:
+        """焊材库全部牌号（内置+用户自定义）。"""
+        try:
+            return [c.brand for c in self.standard.all_consumables()]
+        except Exception:
+            return []
+
+    def _on_brand_changed(self, row: int, brand: str) -> None:
+        """牌号变化：若库中存在，自动联动型号/分类栏位/类型/直径。"""
+        brand = brand.strip()
+        if not brand:
+            return
+        c = self.standard.get_consumable(brand)
+        if c is None:
+            return
+        if self.cons_table.item(row, 1):
+            self.cons_table.item(row, 1).setText(c.model)
+        if self.cons_table.item(row, 2):
+            self.cons_table.item(row, 2).setText(c.classification_slot)
+        dia = self.cons_table.cellWidget(row, 3)
+        if dia and c.diameter:
+            dia.setValue(c.diameter)
+        tc = self.cons_table.cellWidget(row, 4)
+        if tc:
+            idx = tc.findData(c.type)
+            if idx >= 0:
+                tc.setCurrentIndex(idx)
 
     def _add_pass_row(
         self, role: str = "填充", process: WeldingProcess | None = None,
@@ -552,7 +588,9 @@ class ProcedureDialog(QDialog):
         # 焊材
         consumables: list[Consumable] = []
         for r in range(self.cons_table.rowCount()):
-            brand = self.cons_table.item(r, 0).text().strip()
+            # 牌号现在是 QComboBox（cellWidget），型号/栏位仍是 QTableWidgetItem
+            brand_widget = self.cons_table.cellWidget(r, 0)
+            brand = brand_widget.currentText().strip() if brand_widget else ""
             if not brand:
                 continue
             consumables.append(Consumable(

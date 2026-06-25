@@ -80,6 +80,9 @@ def render_groove(
     elif gtype == "V":
         _draw_v(ax, t, plate_half_w, half_gap, angle, root_face)
         title = f"V形坡口 {angle:g}° 钝边{root_face:g} 间隙{root_gap:g}mm"
+    elif gtype == "Y":
+        _draw_y(ax, t, plate_half_w, half_gap, angle, root_face)
+        title = f"Y形坡口 {angle:g}° 钝边{root_face:g} 间隙{root_gap:g}mm"
     elif gtype == "X":
         _draw_x(ax, t, plate_half_w, half_gap, angle, root_face)
         title = f"X形(双V)坡口 {angle:g}° 钝边{root_face:g} 间隙{root_gap:g}mm"
@@ -115,6 +118,51 @@ def render_groove(
 
 
 # ---------------------------------------------------------------------------
+# 坡口截面积（供成本计算，与上述绘图几何保持一致）
+# ---------------------------------------------------------------------------
+
+def groove_cross_area(groove: GrooveDesign, thickness: float) -> float:
+    """计算焊缝坡口截面积（mm²），用于焊材消耗量估算。
+
+    截面积 = 坡口填充金属的横截面积。各坡口形式解析公式：
+
+    - I形：间隙 × 板厚 + 余高（顶部凸起，按经验 t*2 估）
+    - V/Y形：根部间隙矩形 + 两三角斜边区域
+            ≈ gap*t + (t-root_face)² * tan(angle/2)
+    - X形：上下对称两个 V：≈ gap*t + 2*((t/2-root_face/2)² * tan(angle/2))
+    - U形：用近似（半圆 + 直边）：≈ gap*t + (t-root_face)² * tan(angle/2) * 0.7
+
+    返回值含一定余量（与成本计算的 1.1 余高系数配合）。
+    """
+    t = max(thickness, 2.0)
+    angle = groove.angle if groove.angle and groove.angle > 0 else 60.0
+    root_face = groove.root_face if groove.root_face and groove.root_face >= 0 else 2.0
+    root_gap = groove.root_gap if groove.root_gap and groove.root_gap >= 0 else 2.0
+    gtype = (groove.type or "V").upper().strip()
+
+    half_angle = math.radians(angle / 2)
+
+    if gtype == "I":
+        # I形：间隙×板厚
+        return root_gap * t
+    if gtype in ("V", "Y"):
+        # V/Y形：间隙矩形 + 两三角（单侧 (t-p)²*tan(a/2)，两侧 ×2）
+        bevel = max(t - root_face, 0)
+        return root_gap * t + bevel * bevel * math.tan(half_angle)
+    if gtype == "X":
+        # X形：间隙矩形 + 上下各两三角（共4个，单侧高度 (t/2 - p/2)）
+        half_bevel = max(t / 2 - root_face / 2, 0)
+        return root_gap * t + 2 * (half_bevel * half_bevel * math.tan(half_angle))
+    if gtype == "U":
+        # U形：近似为 V 的 0.7 倍（圆弧比直边省材）
+        bevel = max(t - root_face, 0)
+        return root_gap * t + 0.7 * bevel * bevel * math.tan(half_angle)
+    # 回退 V 形
+    bevel = max(t - root_face, 0)
+    return root_gap * t + bevel * bevel * math.tan(half_angle)
+
+
+# ---------------------------------------------------------------------------
 # 各坡口形式绘制（坐标单位 mm，以根部中心为原点）
 # ---------------------------------------------------------------------------
 
@@ -140,6 +188,36 @@ def _draw_v(ax, t, half_w, half_gap, angle, root_face):
         (half_gap, 0),
     ], closed=True, facecolor="#d0d0d0", edgecolor="k", linewidth=1.0)
     ax.add_patch(right)
+
+
+def _draw_y(ax, t, half_w, half_gap, angle, root_face):
+    """Y形坡口：上部斜边坡口 + 较高直边钝边（斜边从板厚中部开始）。
+
+    与 V 形区别：斜边只占上部约一半板厚，下半为垂直直边钝边，
+    适用于较厚板（减少填充金属量）。斜边段高度 = (t - root_face)。
+    """
+    # 斜边坡口段高度（占钝边以上的部分）
+    bevel_h = t - root_face
+    slope_offset = bevel_h * math.tan(math.radians(angle / 2))
+    # 左母材：外缘→顶部斜边→斜边底(转折点)→直边钝边→根部
+    left = Polygon([
+        (-half_w, 0), (-half_w, t),
+        (-half_gap - slope_offset, t),       # 顶部斜边外端
+        (-half_gap, root_face),               # 斜边转折到直边(钝边顶)
+        (-half_gap, 0),                        # 垂直钝边到根部
+    ], closed=True, facecolor="#d0d0d0", edgecolor="k", linewidth=1.0)
+    ax.add_patch(left)
+    # 右母材（镜像）
+    right = Polygon([
+        (half_w, 0), (half_w, t),
+        (half_gap + slope_offset, t),
+        (half_gap, root_face),
+        (half_gap, 0),
+    ], closed=True, facecolor="#d0d0d0", edgecolor="k", linewidth=1.0)
+    ax.add_patch(right)
+    # 标注钝边位置
+    ax.plot([-half_gap - slope_offset, half_gap + slope_offset],
+            [root_face, root_face], color="#aaa", linestyle=":", linewidth=0.5)
 
 
 def _draw_x(ax, t, half_w, half_gap, angle, root_face):

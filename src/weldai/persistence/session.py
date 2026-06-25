@@ -64,7 +64,7 @@ def _migrate(engine) -> None:
 
     insp = inspect(engine)
     # 当前代码支持的 schema 版本（每次新增字段/表时递增）
-    CURRENT_SCHEMA_VERSION = 2  # v1=初始 v2=+doc_meta/last_work_date
+    CURRENT_SCHEMA_VERSION = 3  # v1=初始 v2=+doc_meta/last_work_date v3=+consumables.price/processes/is_builtin
 
     with engine.connect() as conn:
         version = conn.execute(text("PRAGMA user_version")).scalar() or 0
@@ -72,6 +72,10 @@ def _migrate(engine) -> None:
         migrations = [
             ("welders", "last_work_date", "DATE"),
             ("procedures", "doc_meta", "JSON"),
+            # v3: 焊材库管理 —— 价格/适用方法/内置标记
+            ("consumables", "price", "FLOAT DEFAULT 0"),
+            ("consumables", "processes", "JSON"),
+            ("consumables", "is_builtin", "BOOLEAN DEFAULT 0"),
         ]
         for table, column, coltype in migrations:
             if table not in insp.get_table_names():

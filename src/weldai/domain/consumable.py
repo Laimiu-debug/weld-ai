@@ -36,6 +36,16 @@ class ConsumableType(str, Enum):
         }[self]
 
 
+# 焊材类型 → 适用焊接方法（processes 字段为空时的回退推断规则）
+_TYPE_PROCESS_FALLBACK: dict[ConsumableType, list[str]] = {
+    ConsumableType.ELECTRODE: ["SMAW"],
+    ConsumableType.WIRE: ["GTAW", "GMAW", "FCAW"],
+    ConsumableType.FLUX: ["SAW"],
+    ConsumableType.WIRE_FLUX_COMBO: ["SAW"],
+    ConsumableType.STRIP: ["SAW"],
+}
+
+
 @dataclass
 class Consumable:
     """焊材。
@@ -55,8 +65,23 @@ class Consumable:
     standard: str = ""               # 产品标准号 GB/T 5118
     diameter: float | None = None    # 规格/直径 mm
     applicable_groups: list[str] = field(default_factory=list)  # 适用母材类组
+    price: float = 0.0               # 参考单价（元/kg），用于成本估算联动
+    processes: list[str] = field(default_factory=list)  # 适用焊接方法代号(如["SMAW"])；空则按 type 回退推断
     remark: str = ""
 
     def __str__(self) -> str:
         d = f" φ{self.diameter:g}" if self.diameter else ""
         return f"{self.brand} [{self.model}]{d}"
+
+    def applicable_processes(self) -> list[str]:
+        """本焊材适用的焊接方法代号。
+
+        优先用显式 processes；为空时按焊材类型回退推断：
+          electrode → SMAW
+          wire      → GTAW, GMAW, FCAW
+          flux/combo → SAW
+          strip     → SAW(堆焊)
+        """
+        if self.processes:
+            return list(self.processes)
+        return _TYPE_PROCESS_FALLBACK.get(self.type, [])

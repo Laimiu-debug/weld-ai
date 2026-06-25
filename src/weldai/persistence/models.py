@@ -49,7 +49,10 @@ class ConsumableORM(Base):
     standard: Mapped[str] = mapped_column(String(64), default="")
     diameter: Mapped[float | None] = mapped_column(Float, nullable=True)
     applicable_groups: Mapped[list] = mapped_column(JSON, default=list)
+    price: Mapped[float] = mapped_column(Float, default=0.0)  # 参考单价 元/kg
+    processes: Mapped[list] = mapped_column(JSON, default=list)  # 适用焊接方法代号
     remark: Mapped[str] = mapped_column(Text, default="")
+    is_builtin: Mapped[bool] = mapped_column(Boolean, default=False)  # 是否内置(YAML)
 
 
 class ProcedureORM(Base):

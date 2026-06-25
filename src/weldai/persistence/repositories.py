@@ -30,7 +30,7 @@ from ..domain.procedure import PassLayer, Procedure, PWHTSpec
 from ..domain.welder import RenewalRecord, Welder, WelderQualification
 from ..domain.weld_seam import Product, WeldSeam
 from ..standards.base import StandardProfile
-from .models import ProcedureORM, ProductORM, WelderORM
+from .models import ConsumableORM, ProcedureORM, ProductORM, WelderORM
 
 
 # ---------------------------------------------------------------------------
@@ -46,6 +46,8 @@ def _consumable_to_dict(c: Consumable) -> dict:
         "standard": c.standard,
         "diameter": c.diameter,
         "applicable_groups": c.applicable_groups,
+        "price": c.price,
+        "processes": c.processes,
         "remark": c.remark,
     }
 
@@ -59,6 +61,8 @@ def _consumable_from_dict(d: dict) -> Consumable:
         standard=d.get("standard", ""),
         diameter=d.get("diameter"),
         applicable_groups=d.get("applicable_groups", []),
+        price=d.get("price", 0.0),
+        processes=d.get("processes", []),
         remark=d.get("remark", ""),
     )
 
@@ -530,4 +534,75 @@ class ProductRepository:
             seam.drawing_no = product.drawing_no
         product.seams.append(seam)
         self.save(product)
+        return True
+
+
+class ConsumableRepository:
+    """焊材库仓库（用户自定义焊材的 CRUD，持久化到 SQLite）。
+
+    系统内置焊材从 YAML 加载（只读），用户添加的焊材存库。
+    两者在标准 profile 的 all_consumables() 中合并查询（详见块4）。
+    """
+
+    def __init__(self, session: Session):
+        self.session = session
+
+    def _to_orm(self, c: Consumable, orm: ConsumableORM | None = None) -> ConsumableORM:
+        if orm is None:
+            orm = ConsumableORM()
+        orm.brand = c.brand
+        orm.model = c.model
+        orm.type = c.type.value
+        orm.classification_slot = c.classification_slot
+        orm.standard = c.standard
+        orm.diameter = c.diameter
+        orm.applicable_groups = list(c.applicable_groups)
+        orm.price = c.price
+        orm.processes = list(c.processes)
+        orm.remark = c.remark
+        orm.is_builtin = False  # 用户经此仓库保存的均为自定义
+        return orm
+
+    def _from_orm(self, orm: ConsumableORM) -> Consumable:
+        return Consumable(
+            brand=orm.brand,
+            model=orm.model,
+            type=ConsumableType(orm.type),
+            classification_slot=orm.classification_slot,
+            standard=orm.standard or "",
+            diameter=orm.diameter,
+            applicable_groups=list(orm.applicable_groups or []),
+            price=orm.price or 0.0,
+            processes=list(orm.processes or []),
+            remark=orm.remark or "",
+        )
+
+    def list_all(self) -> list[Consumable]:
+        stmt = select(ConsumableORM).order_by(ConsumableORM.brand)
+        return [self._from_orm(o) for o in self.session.scalars(stmt).all()]
+
+    def get(self, brand: str) -> Consumable | None:
+        orm = self.session.scalar(
+            select(ConsumableORM).where(ConsumableORM.brand == brand)
+        )
+        return self._from_orm(orm) if orm else None
+
+    def save(self, c: Consumable) -> Consumable:
+        """新增或更新焊材（按 brand 去重）。"""
+        orm = self.session.scalar(
+            select(ConsumableORM).where(ConsumableORM.brand == c.brand)
+        )
+        orm = self._to_orm(c, orm)
+        self.session.add(orm)
+        self.session.commit()
+        return self._from_orm(orm)
+
+    def delete(self, brand: str) -> bool:
+        orm = self.session.scalar(
+            select(ConsumableORM).where(ConsumableORM.brand == brand)
+        )
+        if orm is None:
+            return False
+        self.session.delete(orm)
+        self.session.commit()
         return True

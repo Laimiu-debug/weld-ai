@@ -30,11 +30,26 @@ class WelderQualification:
     deposited_thickness: float = 12.0     # ④ 焊缝金属厚度 mm
     outer_diameter: float | None = None  # ⑤ 管材外径 mm（板材试件为 None）
     fill_metal_class: str = ""       # ⑥ 填充金属类别，如 "Fef3J"/"FefS"
-    process_factor: str = ""         # ⑦ 焊接工艺因素代号，如 "01"/"13"
+    process_factors: list = field(default_factory=list)  # ⑦ 焊接工艺因素代号(多选)，如 ["01","02"]
     specimen_form: str = ""          # 试件形式（冗余，仅显示用；从位置推断）
     has_backing: bool = False        # 是否带衬垫（影响覆盖：不衬垫覆盖衬垫，反之不可）
     qualified_date: date | None = None    # 合格日期
     expire_date: date | None = None       # 到期日（有效期 4 年）
+
+    # 兼容旧字段：process_factor 单值 → process_factors 多值
+    @property
+    def process_factor(self) -> str:
+        """⑦工艺因素（多选用加号连接，兼容旧代码）。"""
+        return "+".join(self.process_factors)
+
+    @process_factor.setter
+    def process_factor(self, v):
+        if isinstance(v, list):
+            self.process_factors = v
+        elif isinstance(v, str) and v:
+            self.process_factors = [v]
+        else:
+            self.process_factors = []
 
     @property
     def is_expired(self) -> bool:
@@ -56,9 +71,9 @@ class WelderQualification:
         # ⑥填充金属类别
         if self.fill_metal_class:
             parts.append(self.fill_metal_class)
-        # ⑦工艺因素代号
-        if self.process_factor:
-            parts.append(self.process_factor)
+        # ⑦工艺因素代号（多选用加号连接）
+        if self.process_factors:
+            parts.append("+".join(self.process_factors))
         return "-".join(str(p) for p in parts)
 
     def _position_code(self) -> str:

@@ -303,7 +303,8 @@ def _qualification_to_dict(q: WelderQualification) -> dict:
         "deposited_thickness": q.deposited_thickness,
         "outer_diameter": q.outer_diameter,
         "fill_metal_class": q.fill_metal_class,
-        "process_factor": q.process_factor,
+        "process_factors": list(q.process_factors),
+        "process_factor": q.process_factor,  # 兼容旧字段(多选加号连接)
         "specimen_form": q.specimen_form,
         "has_backing": q.has_backing,
         "qualified_date": q.qualified_date.isoformat() if q.qualified_date else None,
@@ -312,6 +313,13 @@ def _qualification_to_dict(q: WelderQualification) -> dict:
 
 
 def _qualification_from_dict(d: dict) -> WelderQualification:
+    # 优先用 process_factors 列表(新)，回退 process_factor 字符串(旧)
+    if d.get("process_factors"):
+        factors = list(d["process_factors"])
+    elif d.get("process_factor"):
+        factors = d["process_factor"].split("+") if "+" in d["process_factor"] else [d["process_factor"]]
+    else:
+        factors = []
     return WelderQualification(
         process=WeldingProcess(d["process"]),
         material_category=d.get("material_category", ""),
@@ -319,7 +327,7 @@ def _qualification_from_dict(d: dict) -> WelderQualification:
         deposited_thickness=d.get("deposited_thickness", 12.0),
         outer_diameter=d.get("outer_diameter"),
         fill_metal_class=d.get("fill_metal_class", ""),
-        process_factor=d.get("process_factor", ""),
+        process_factors=factors,
         specimen_form=d.get("specimen_form", ""),
         has_backing=d.get("has_backing", False),
         qualified_date=_parse_date(d.get("qualified_date")),

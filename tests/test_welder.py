@@ -106,11 +106,24 @@ class TestProjectCode:
             deposited_thickness=12.0,
             position=Position.PLATE_1G,
             fill_metal_class="Fef3J",
-            process_factor="01",
+            process_factors=["01"],
         )
         code = q.project_code
         # 标准结构 ①-②-③-④-⑥-⑦
         assert code == "SMAW-FeⅠ-1G-12-Fef3J-01"
+
+    def test_multi_factor_in_code(self):
+        """工艺因素多选用加号连接。"""
+        q = WelderQualification(
+            process=WeldingProcess.SMAW,
+            material_category="FeⅠ",
+            deposited_thickness=12.0,
+            position=Position.PLATE_1G,
+            fill_metal_class="Fef3J",
+            process_factors=["01", "02"],
+        )
+        code = q.project_code
+        assert "01+02" in code, f"多因素应用加号连接: {code}"
 
     def test_backing_mark_in_code(self):
         q = WelderQualification(
@@ -121,7 +134,7 @@ class TestProjectCode:
             position=Position.PIPE_6G,
             has_backing=True,
             fill_metal_class="FefS",
-            process_factor="02",
+            process_factors=["02"],
         )
         code = q.project_code
         assert "6G(管)(K)" in code   # ③位置带衬垫标记

@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QLabel,
     QLineEdit,
+    QMenu,
     QMessageBox,
     QPushButton,
     QSpinBox,
@@ -81,6 +82,62 @@ def _positions_for_form(form: str) -> list[Position]:
                       Position.PLATE_3F, Position.PLATE_4F],
     }
     return mapping.get(form, list(Position))
+
+
+class MultiFactorButton(QPushButton):
+    """⑦焊接工艺因素多选按钮：点击弹出复选菜单，支持多选。
+
+    用法：构造时传入可选项；selected_factors() 返回选中项列表。
+    """
+
+    def __init__(self, items: list[str], parent=None):
+        super().__init__("（点击选择）", parent)
+        self._items = list(items)
+        self._checks: dict[str, QCheckBox] = {}
+        self.setMenu(QMenu(self))
+        self._build_menu()
+        self.clicked.connect(self.showMenu)
+
+    def _build_menu(self) -> None:
+        menu = self.menu()
+        menu.clear()
+        self._checks.clear()
+        for it in self._items:
+            act = menu.addAction(it)
+            act.setCheckable(True)
+            act.toggled.connect(lambda checked, code=it: self._on_toggle(code, checked))
+
+    def _on_toggle(self, code: str, checked: bool) -> None:
+        if checked:
+            self._checks[code] = True
+        else:
+            self._checks.pop(code, None)
+        self._refresh_label()
+
+    def _refresh_label(self) -> None:
+        sel = sorted(self._checks.keys())
+        self.setText("+".join(sel) if sel else "（点击选择）")
+
+    def set_items(self, items: list[str]) -> None:
+        """切换可选项时，保留仍有效的选中。"""
+        old_sel = set(self._checks.keys())
+        self._items = list(items)
+        self._build_menu()
+        # 恢复仍有效的选中
+        for it in items:
+            if it in old_sel:
+                self._checks[it] = True
+        self._refresh_label()
+
+    def selected_factors(self) -> list[str]:
+        return sorted(self._checks.keys())
+
+    def set_selected(self, factors: list[str]) -> None:
+        self._checks = {f: True for f in factors if f in self._items}
+        # 同步菜单勾选状态
+        for action in self.menu().actions():
+            action.setChecked(action.text() in self._checks)
+        self._refresh_label()
 
 
 class WelderDialog(QDialog):
@@ -190,6 +247,12 @@ class WelderDialog(QDialog):
             pos_raw = self.qual_table.cellWidget(r, 3).currentData()
             pos = (pos_raw if isinstance(pos_raw, Position)
                    else Position(pos_raw))
+            fa_widget = self.qual_table.cellWidget(r, 7)
+            if isinstance(fa_widget, MultiFactorButton):
+                factors = fa_widget.selected_factors()
+            else:
+                txt = fa_widget.currentText().strip()
+                factors = txt.split("+") if "+" in txt else ([txt] if txt else [])
             q = WelderQualification(
                 process=proc,
                 material_category=self.qual_table.cellWidget(r, 2).currentText(),
@@ -197,7 +260,7 @@ class WelderDialog(QDialog):
                 deposited_thickness=self.qual_table.cellWidget(r, 4).value(),
                 outer_diameter=(self.qual_table.cellWidget(r, 5).value() or None),
                 fill_metal_class=self.qual_table.cellWidget(r, 6).currentText().strip(),
-                process_factor=self.qual_table.cellWidget(r, 7).currentText().strip(),
+                process_factors=factors,
                 has_backing=self.qual_table.cellWidget(r, 8).isChecked(),
             )
             self.code_preview.setText(
@@ -237,9 +300,8 @@ class WelderDialog(QDialog):
         fill_metal = QComboBox()
         fill_metal.setEditable(True)
         fill_metal.addItems(_FILL_METAL_CLASSES)
-        # col7: ⑦工艺因素
-        factor = QComboBox()
-        factor.setEditable(True)
+        # col7: ⑦工艺因素（多选）
+        factor = MultiFactorButton(_PROCESS_FACTORS.get(WeldingProcess.SMAW, []))
         # col8: 衬垫
         backing = QCheckBox("带衬垫")
         # col9: 到期日
@@ -255,7 +317,7 @@ class WelderDialog(QDialog):
         # 联动：试件形式变化 → 该行位置列表 + 管径启用（每行独立）
         form_combo.currentTextChanged.connect(
             lambda t, r=row, p=pos, d=dia: self._on_form_change(r, t, p, d))
-        # 联动：焊接方法 → 工艺因素预设
+        # 联动：焊接方法 → 工艺因素预设项刷新
         proc.currentIndexChanged.connect(
             lambda _, r=row, pr=proc, fa=factor: self._on_process_change_row(r, pr, fa))
 
@@ -273,15 +335,16 @@ class WelderDialog(QDialog):
             pos.setCurrentText(q.position.value)
             fill_metal.setEditText(q.fill_metal_class)
             self._on_process_change_row(row, proc, factor)
-            factor.setEditText(q.process_factor)
+            factor.set_selected(q.process_factors)
             backing.setChecked(q.has_backing)
             if q.expire_date:
                 from PySide6.QtCore import QDate
                 expire.setDate(QDate(q.expire_date.year, q.expire_date.month,
                                      q.expire_date.day))
         else:
-            # 新行：默认板对接，触发联动填充位置
-            self._on_form_change(row, "板对接", pos, dia)
+            # 新行：不预填试件形式，位置列表为空提示用户先选形式
+            pos.addItem("（请先选试件形式）", None)
+            dia.setEnabled(False)
             self._on_process_change_row(row, proc, factor)
 
     def _on_form_change(self, row: int, form_text: str,
@@ -308,19 +371,24 @@ class WelderDialog(QDialog):
             dia_spin.setValue(0)
 
     def _on_process_change_row(self, row: int, proc_combo: QComboBox,
-                               factor_combo: QComboBox) -> None:
-        """焊接方法联动：刷新工艺因素预设列表。"""
+                               factor_combo) -> None:
+        """焊接方法联动：刷新工艺因素预设项（多选按钮）。"""
         proc_raw = proc_combo.currentData()
         proc = (proc_raw if isinstance(proc_raw, WeldingProcess)
                 else WeldingProcess(proc_raw))
-        cur = factor_combo.currentText()
-        factor_combo.blockSignals(True)
-        factor_combo.clear()
-        for f in _PROCESS_FACTORS.get(proc, []):
-            factor_combo.addItem(f)
-        factor_combo.blockSignals(False)
-        if cur:
-            factor_combo.setEditText(cur)
+        items = _PROCESS_FACTORS.get(proc, [])
+        # MultiFactorButton 用 set_items；旧式 QComboBox 兼容
+        if isinstance(factor_combo, MultiFactorButton):
+            factor_combo.set_items(items)
+        else:
+            cur = factor_combo.currentText()
+            factor_combo.blockSignals(True)
+            factor_combo.clear()
+            for f in items:
+                factor_combo.addItem(f)
+            factor_combo.blockSignals(False)
+            if cur:
+                factor_combo.setEditText(cur)
 
     def _del_qual_row(self) -> None:
         rows = sorted(
@@ -374,7 +442,13 @@ class WelderDialog(QDialog):
             thick = self.qual_table.cellWidget(r, 4).value()
             dia = self.qual_table.cellWidget(r, 5).value()
             fill_metal = self.qual_table.cellWidget(r, 6).currentText().strip()
-            factor = self.qual_table.cellWidget(r, 7).currentText().strip()
+            fa_widget = self.qual_table.cellWidget(r, 7)
+            # 工艺因素多选：从 MultiFactorButton 取选中列表，兼容旧 QComboBox
+            if isinstance(fa_widget, MultiFactorButton):
+                factors = fa_widget.selected_factors()
+            else:
+                txt = fa_widget.currentText().strip()
+                factors = txt.split("+") if "+" in txt else ([txt] if txt else [])
             backing = self.qual_table.cellWidget(r, 8).isChecked()
             ed = self.qual_table.cellWidget(r, 9).date()
             welder.qualifications.append(WelderQualification(
@@ -384,7 +458,7 @@ class WelderDialog(QDialog):
                 deposited_thickness=thick,
                 outer_diameter=(dia or None),
                 fill_metal_class=fill_metal,
-                process_factor=factor,
+                process_factors=factors,
                 specimen_form=pos.form_type,
                 has_backing=backing,
                 qualified_date=date.today(),

@@ -147,9 +147,10 @@ class WelderDialog(QDialog):
     def _build_qual_group(self) -> QGroupBox:
         gb = QGroupBox("合格资格项目（TSG Z6002 ①-②-③-④/⑤-⑥-⑦）")
         lay = QVBoxLayout(gb)
-        self.qual_table = QTableWidget(0, 9)
+        # 10列：试件形式(驱动) + ①方法 ②母材 ③位置 ④厚度 ⑤管径 ⑥填充金属 ⑦工艺因素 衬垫 到期
+        self.qual_table = QTableWidget(0, 10)
         self.qual_table.setHorizontalHeaderLabels(
-            ["①方法", "②母材类", "③位置", "④厚度(mm)",
+            ["试件形式", "①方法", "②母材类", "③位置", "④厚度(mm)",
              "⑤管径(mm)", "⑥填充金属", "⑦工艺因素", "衬垫", "到期日"]
         )
         self.qual_table.horizontalHeader().setSectionResizeMode(
@@ -163,14 +164,10 @@ class WelderDialog(QDialog):
         del_q.clicked.connect(self._del_qual_row)
         btn_row.addWidget(add_q)
         btn_row.addWidget(del_q)
-        # 试件形式快捷切换（驱动当前行的位置列表）
-        btn_row.addWidget(QLabel("当前行试件形式："))
-        self.form_switch = QComboBox()
-        self.form_switch.addItems(_SPECIMEN_FORMS)
-        self.form_switch.currentTextChanged.connect(self._on_form_switch)
-        btn_row.addWidget(self.form_switch)
         btn_row.addStretch()
         lay.addLayout(btn_row)
+        tip = QLabel("<small style='color:#888'>提示：在「试件形式」列选择后，「③位置」列会自动联动出对应代号。</small>")
+        lay.addWidget(tip)
         # 项目代号实时预览
         self.code_preview = QLabel(
             "<small style='color:#888'>选中资格行查看项目代号预览</small>")
@@ -187,21 +184,21 @@ class WelderDialog(QDialog):
             return
         r = rows[0].row()
         try:
-            proc_raw = self.qual_table.cellWidget(r, 0).currentData()
+            proc_raw = self.qual_table.cellWidget(r, 1).currentData()
             proc = (proc_raw if isinstance(proc_raw, WeldingProcess)
                     else WeldingProcess(proc_raw))
-            pos_raw = self.qual_table.cellWidget(r, 2).currentData()
+            pos_raw = self.qual_table.cellWidget(r, 3).currentData()
             pos = (pos_raw if isinstance(pos_raw, Position)
                    else Position(pos_raw))
             q = WelderQualification(
                 process=proc,
-                material_category=self.qual_table.cellWidget(r, 1).currentText(),
+                material_category=self.qual_table.cellWidget(r, 2).currentText(),
                 position=pos,
-                deposited_thickness=self.qual_table.cellWidget(r, 3).value(),
-                outer_diameter=(self.qual_table.cellWidget(r, 4).value() or None),
-                fill_metal_class=self.qual_table.cellWidget(r, 5).currentText().strip(),
-                process_factor=self.qual_table.cellWidget(r, 6).currentText().strip(),
-                has_backing=self.qual_table.cellWidget(r, 7).isChecked(),
+                deposited_thickness=self.qual_table.cellWidget(r, 4).value(),
+                outer_diameter=(self.qual_table.cellWidget(r, 5).value() or None),
+                fill_metal_class=self.qual_table.cellWidget(r, 6).currentText().strip(),
+                process_factor=self.qual_table.cellWidget(r, 7).currentText().strip(),
+                has_backing=self.qual_table.cellWidget(r, 8).isChecked(),
             )
             self.code_preview.setText(
                 f"<b style='color:#1565c0'>项目代号：{q.project_code}</b>")
@@ -216,41 +213,48 @@ class WelderDialog(QDialog):
         row = self.qual_table.rowCount()
         self.qual_table.insertRow(row)
 
+        # col0: 试件形式（驱动该行位置列表，每行独立联动）
+        form_combo = QComboBox()
+        form_combo.addItems(_SPECIMEN_FORMS)
+        # col1: ①方法
         proc = QComboBox()
         for p, lab in _PROCESS_ITEMS:
             proc.addItem(lab, p)
+        # col2: ②母材类
         mat = QComboBox()
         mat.setEditable(True)
         mat.addItems(_MATERIAL_CATEGORIES)
-        # ③位置（由试件形式联动驱动，这里先建空下拉，下方形式选择会填充）
+        # col3: ③位置（由试件形式联动填充）
         pos = QComboBox()
-        # ④厚度 ⑤管径
+        # col4: ④厚度
         thick = QDoubleSpinBox()
         thick.setRange(0, 200); thick.setDecimals(1); thick.setValue(12.0)
+        # col5: ⑤管径
         dia = QDoubleSpinBox()
         dia.setRange(0, 5000); dia.setDecimals(1); dia.setValue(0)
         dia.setSpecialValueText("（板材）")
-        # ⑥填充金属类别 ⑦工艺因素
+        # col6: ⑥填充金属类别
         fill_metal = QComboBox()
         fill_metal.setEditable(True)
         fill_metal.addItems(_FILL_METAL_CLASSES)
+        # col7: ⑦工艺因素
         factor = QComboBox()
         factor.setEditable(True)
-        # 衬垫
+        # col8: 衬垫
         backing = QCheckBox("带衬垫")
-        # 到期日
+        # col9: 到期日
         expire = QDateEdit()
         expire.setCalendarPopup(True)
         expire.setDisplayFormat("yyyy-MM-dd")
         expire.setDate(date.today().replace(year=date.today().year + 4))
 
-        widgets = [proc, mat, pos, thick, dia, fill_metal, factor, backing, expire]
+        widgets = [form_combo, proc, mat, pos, thick, dia, fill_metal, factor, backing, expire]
         for col, w in enumerate(widgets):
             self.qual_table.setCellWidget(row, col, w)
 
-        # 试件形式由顶部 form_switch 控件驱动，初始用板对接
-        self._on_form_change(row, "板对接", pos, dia)
-
+        # 联动：试件形式变化 → 该行位置列表 + 管径启用（每行独立）
+        form_combo.currentTextChanged.connect(
+            lambda t, r=row, p=pos, d=dia: self._on_form_change(r, t, p, d))
         # 联动：焊接方法 → 工艺因素预设
         proc.currentIndexChanged.connect(
             lambda _, r=row, pr=proc, fa=factor: self._on_process_change_row(r, pr, fa))
@@ -260,8 +264,11 @@ class WelderDialog(QDialog):
             mat.setEditText(q.material_category)
             thick.setValue(q.deposited_thickness)
             dia.setValue(q.outer_diameter or 0)
-            # 根据位置推断试件形式并联动
+            # 根据位置推断试件形式，先设试件形式（触发联动填充位置列表）
             init_form = q.position.form_type
+            form_combo.blockSignals(True)
+            form_combo.setCurrentText(init_form)
+            form_combo.blockSignals(False)
             self._on_form_change(row, init_form, pos, dia)
             pos.setCurrentText(q.position.value)
             fill_metal.setEditText(q.fill_metal_class)
@@ -273,18 +280,9 @@ class WelderDialog(QDialog):
                 expire.setDate(QDate(q.expire_date.year, q.expire_date.month,
                                      q.expire_date.day))
         else:
+            # 新行：默认板对接，触发联动填充位置
+            self._on_form_change(row, "板对接", pos, dia)
             self._on_process_change_row(row, proc, factor)
-
-    def _on_form_switch(self, form_text: str) -> None:
-        """顶部试件形式切换：刷新当前选中行的位置列表 + 管径启用。"""
-        rows = self.qual_table.selectionModel().selectedRows()
-        if not rows:
-            return
-        r = rows[0].row()
-        pos = self.qual_table.cellWidget(r, 2)
-        dia = self.qual_table.cellWidget(r, 4)
-        if pos and dia:
-            self._on_form_change(r, form_text, pos, dia)
 
     def _on_form_change(self, row: int, form_text: str,
                         pos_combo: QComboBox, dia_spin: QDoubleSpinBox) -> None:
@@ -366,19 +364,19 @@ class WelderDialog(QDialog):
                             else None),
         )
         for r in range(self.qual_table.rowCount()):
-            proc_raw = self.qual_table.cellWidget(r, 0).currentData()
-            # Qt 会把 (str,Enum) 退化为纯 str，强制转回枚举保证序列化/比较正确
+            # 新结构：col0=试件形式 col1=方法 col2=母材 col3=位置 col4=厚度
+            # col5=管径 col6=填充金属 col7=因素 col8=衬垫 col9=到期
+            proc_raw = self.qual_table.cellWidget(r, 1).currentData()
             proc = proc_raw if isinstance(proc_raw, WeldingProcess) else WeldingProcess(proc_raw)
-            mat = self.qual_table.cellWidget(r, 1).currentText()
-            # 新结构：col2=位置 col3=厚度 col4=管径 col5=填充金属 col6=因素 col7=衬垫 col8=到期
-            pos_raw = self.qual_table.cellWidget(r, 2).currentData()
+            mat = self.qual_table.cellWidget(r, 2).currentText()
+            pos_raw = self.qual_table.cellWidget(r, 3).currentData()
             pos = pos_raw if isinstance(pos_raw, Position) else Position(pos_raw)
-            thick = self.qual_table.cellWidget(r, 3).value()
-            dia = self.qual_table.cellWidget(r, 4).value()
-            fill_metal = self.qual_table.cellWidget(r, 5).currentText().strip()
-            factor = self.qual_table.cellWidget(r, 6).currentText().strip()
-            backing = self.qual_table.cellWidget(r, 7).isChecked()
-            ed = self.qual_table.cellWidget(r, 8).date()
+            thick = self.qual_table.cellWidget(r, 4).value()
+            dia = self.qual_table.cellWidget(r, 5).value()
+            fill_metal = self.qual_table.cellWidget(r, 6).currentText().strip()
+            factor = self.qual_table.cellWidget(r, 7).currentText().strip()
+            backing = self.qual_table.cellWidget(r, 8).isChecked()
+            ed = self.qual_table.cellWidget(r, 9).date()
             welder.qualifications.append(WelderQualification(
                 process=proc,
                 material_category=mat,
